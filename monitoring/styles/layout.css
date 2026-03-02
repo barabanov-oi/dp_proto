@@ -19,9 +19,7 @@ body{
   margin:0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
   color:var(--text);
-  background: radial-gradient(1200px 600px at 20% 10%, rgba(109,94,252,.25), transparent 60%),
-              radial-gradient(900px 500px at 90% 40%, rgba(34,197,94,.12), transparent 55%),
-              var(--bg);
+  background: var(--bg);
 }
 a{color:inherit; text-decoration:none}
 .muted{color:var(--muted)}
@@ -109,8 +107,8 @@ a{color:inherit; text-decoration:none}
   bottom:14px; left:16px; right:16px;
   padding:12px;
   border-radius:14px;
-  background: rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.06);
+  background: linear-gradient(120deg, rgba(109,94,252,.18), rgba(34,197,94,.12));
+  border:1px solid rgba(255,255,255,.12);
   color: rgba(255,255,255,.75);
   font-size:12px;
 }
@@ -139,6 +137,10 @@ a{color:inherit; text-decoration:none}
   align-items:center;
   justify-content:space-between;
   margin-bottom:16px;
+  padding:14px 16px;
+  border-radius:16px;
+  border:1px solid rgba(109,94,252,.24);
+  background: linear-gradient(90deg, rgba(109,94,252,.24), rgba(34,197,94,.14));
 }
 .titleWrap h2{
   margin:0;
@@ -274,16 +276,16 @@ select, input[type="date"]{
   padding:12px 14px;
   border-radius: var(--radius);
   border:1px solid rgba(255,255,255,.20);
-  background: linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.09));
+  background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.15));
   color:rgba(255,255,255,.97);
   font-weight:700;
 }
 .channelBtn:hover{
-  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.12));
+  background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,.18));
 }
 .channelBtn.active{
   border-color: rgba(109,94,252,.60);
-  background: linear-gradient(180deg, rgba(149,137,255,.42), rgba(109,94,252,.24));
+  background: linear-gradient(180deg, rgba(175,166,255,.52), rgba(109,94,252,.30));
   color:#fff;
 }
 
@@ -301,6 +303,14 @@ select, input[type="date"]{
 }
 .kpiGridInner{
   margin-bottom:0;
+  padding:12px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.07);
+}
+.kpiGridInner .kpiCard{
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.10));
+  border-color: rgba(255,255,255,.20);
 }
 .kpiGridInner.hidden{
   display:none;
