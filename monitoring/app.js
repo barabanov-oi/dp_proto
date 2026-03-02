@@ -637,31 +637,70 @@
       const detailsWrap = document.createElement("div");
       detailsWrap.className = "campaignDetailsWrap";
 
+      const head = document.createElement("div");
+      head.className = "campaignDetailsHead";
+
       const title = document.createElement("b");
       title.textContent = "Критичные показатели";
-      detailsWrap.appendChild(title);
-
-      const list = document.createElement("ul");
-      list.className = "criticalList";
-      if (r.flags.length === 0) {
-        const li = document.createElement("li");
-        li.textContent = "Критичных отклонений нет";
-        list.appendChild(li);
-      } else {
-        r.flags.forEach((flag) => {
-          const li = document.createElement("li");
-          li.textContent = flag.text;
-          list.appendChild(li);
-        });
-      }
+      head.appendChild(title);
 
       const reviewBtn = document.createElement("button");
       reviewBtn.type = "button";
       reviewBtn.className = "btn btnTiny";
       reviewBtn.textContent = "Обзор";
+      reviewBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+      head.appendChild(reviewBtn);
 
-      detailsWrap.appendChild(list);
-      detailsWrap.appendChild(reviewBtn);
+      const metrics = document.createElement("div");
+      metrics.className = "detailMetrics";
+      const metricItems = [
+        { label: "Расход", value: formatMoney(r.spend, 2), trend: trend.spend ?? 0, inverse: true },
+        { label: "CTR", value: formatPct(r.ctr, 2), trend: trend.ctr ?? 0, inverse: false },
+        { label: "Клики", value: formatInt(r.clicks), trend: trend.clicks ?? 0, inverse: false },
+        { label: "CPC", value: formatMoney(r.cpc, 2), trend: trend.cpc ?? 0, inverse: true },
+        { label: "Конверсии", value: formatInt(r.conv), trend: trend.conv ?? 0, inverse: false },
+        { label: "CR", value: formatPct(r.cr, 2), trend: trend.cr ?? 0, inverse: false },
+        { label: "CPA", value: formatMoney(r.cpa, 2), trend: trend.cpa ?? 0, inverse: true }
+      ];
+      metricItems.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "detailMetricCard";
+
+        const label = document.createElement("span");
+        label.className = "detailMetricLabel";
+        label.textContent = item.label;
+
+        const value = document.createElement("span");
+        value.className = "detailMetricValue mono";
+        value.textContent = item.value;
+        value.appendChild(createTrendElement(item.trend, item.inverse));
+
+        card.appendChild(label);
+        card.appendChild(value);
+        metrics.appendChild(card);
+      });
+
+      const alerts = document.createElement("div");
+      alerts.className = "alertsRect";
+      if (r.flags.length === 0) {
+        const ok = document.createElement("div");
+        ok.className = "alertRect good";
+        ok.textContent = "✅ Критичных отклонений не обнаружено. Кампания работает стабильно.";
+        alerts.appendChild(ok);
+      } else {
+        r.flags.forEach((flag) => {
+          const block = document.createElement("div");
+          block.className = "alertRect " + flag.level;
+          block.textContent = `⚠ ${flag.text}: требуется внимание и проверка настроек.`;
+          alerts.appendChild(block);
+        });
+      }
+
+      detailsWrap.appendChild(head);
+      detailsWrap.appendChild(metrics);
+      detailsWrap.appendChild(alerts);
       detailsTd.appendChild(detailsWrap);
       detailsTr.appendChild(detailsTd);
       tbody.appendChild(detailsTr);

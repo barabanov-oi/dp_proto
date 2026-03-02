@@ -145,6 +145,26 @@ a{color:inherit; text-decoration:none}
   font-size:22px;
   letter-spacing:.2px;
 }
+.titleHead{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.balanceTopBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:12px;
+  background: linear-gradient(180deg, rgba(34,197,94,.20), rgba(34,197,94,.10));
+  color:#fff;
+  font-weight:700;
+}
+.balanceTopLabel{
+  font-size:12px;
+  color: rgba(255,255,255,.82);
+}
 .titleWrap p{
   margin:6px 0 0;
   color:var(--muted);
@@ -464,17 +484,59 @@ canvas{ width:100%; height:260px; display:block; }
   background: rgba(0,0,0,.18);
 }
 .campaignDetailsWrap{
+  display:grid;
+  gap:10px;
+}
+.campaignDetailsHead{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  flex-wrap:wrap;
 }
-.criticalList{
-  margin:8px 0 0;
-  padding-left:16px;
-  color: rgba(255,255,255,.8);
+.detailMetrics{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap:8px;
+}
+.detailMetricCard{
+  background: linear-gradient(180deg, rgba(109,94,252,.16), rgba(34,197,94,.08));
+  border-radius:10px;
+  padding:8px;
+}
+.detailMetricLabel{
+  display:block;
+  font-size:11px;
+  color: rgba(255,255,255,.72);
+}
+.detailMetricValue{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:4px;
+  font-size:13px;
+}
+.alertsRect{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:8px;
+}
+.alertRect{
+  padding:10px;
+  border-radius:10px;
   font-size:12px;
+  line-height:1.35;
+  color: rgba(255,255,255,.92);
+  background: rgba(255,255,255,.08);
+}
+.alertRect.good{ background: rgba(34,197,94,.22); }
+.alertRect.warn{ background: rgba(245,158,11,.22); }
+.alertRect.bad{ background: rgba(239,68,68,.22); }
+
+.criticalList,
+.alertRect,
+.detailMetricCard,
+.balanceTopBadge{
+  border:none;
 }
 .btnTiny{
   padding:6px 10px;
@@ -577,6 +639,8 @@ canvas{ width:100%; height:260px; display:block; }
 @media (max-width: 1100px){
   .kpiGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .channelSwitch{ grid-template-columns: 1fr; }
+  .detailMetrics{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .alertsRect{ grid-template-columns: 1fr; }
   .span-8{ grid-column: span 12; }
   .span-4{ grid-column: span 12; }
 }

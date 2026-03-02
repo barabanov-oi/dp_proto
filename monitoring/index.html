@@ -42,7 +42,13 @@
     <main class="main">
       <div class="topbar">
         <div class="titleWrap">
-          <h2>Мониторинг базовых показателей</h2>
+          <div class="titleHead">
+            <h2>Мониторинг базовых показателей</h2>
+            <div class="balanceTopBadge">
+              <span class="balanceTopLabel">Остаток баланса</span>
+              <span class="mono" id="kpiBalance">—</span>
+            </div>
+          </div>
           <p>Сводный контроль расходов, трафика и эффективности по аккаунту. Демо-данные за последние 14 дней.</p>
         </div>
 
@@ -69,17 +75,6 @@
 
       <!-- KPI: 8 плиток, 4 в ряд -->
       <section class="kpiGrid" aria-label="Показатели">
-        <div class="kpiCard">
-          <div class="kpiTop">
-            <div>
-              <div class="kpiLabel">Остаток баланса</div>
-              <div class="kpiHint">текущий</div>
-            </div>
-            <span class="tag good">Счёт активен</span>
-          </div>
-          <div class="kpiValue mono" id="kpiBalance">—</div>
-        </div>
-
         <div class="kpiCard">
           <div class="kpiTop">
             <div>
