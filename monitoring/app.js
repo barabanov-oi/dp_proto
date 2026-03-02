@@ -514,19 +514,13 @@
     return "bad";
   }
 
-  function buildTrendMarkup(trend = {}) {
-    const items = [
-      { label: "Расход", value: trend.spend ?? 0, inverse: true },
-      { label: "Клики", value: trend.clicks ?? 0, inverse: false },
-      { label: "Конв.", value: trend.conv ?? 0, inverse: false },
-      { label: "CPA", value: trend.cpa ?? 0, inverse: true }
-    ];
-
-    return items.map((item) => {
-      const sign = item.value >= 0 ? "▲" : "▼";
-      const cls = trendClass(item.value, item.inverse);
-      return `<span class="trendBadge ${cls}">${item.label} ${sign} ${Math.abs(item.value).toFixed(1)}%</span>`;
-    }).join("");
+  function createTrendElement(value, inverse = false) {
+    const el = document.createElement("span");
+    const isUp = value >= 0;
+    const arrow = isUp ? "↑" : "↓";
+    el.className = "trendInline " + trendClass(value, inverse);
+    el.textContent = `${arrow} ${Math.abs(value).toFixed(1)}%`;
+    return el;
   }
 
   function renderCampaigns() {
@@ -558,6 +552,7 @@
 
     rows.forEach((r) => {
       const tr = document.createElement("tr");
+      const trend = demo.campaignDeltas[r.name] || {};
 
       // name
       const tdName = document.createElement("td");
@@ -576,6 +571,7 @@
       const tdSpend = document.createElement("td");
       tdSpend.className = "mono spendCell";
       tdSpend.textContent = formatMoney(r.spend, 2);
+      tdSpend.appendChild(createTrendElement(trend.spend ?? 0, true));
 
       const bar = document.createElement("div");
       bar.className = "spendBar";
@@ -602,6 +598,7 @@
       const tdClicks = document.createElement("td");
       tdClicks.className = "mono";
       tdClicks.textContent = formatInt(r.clicks);
+      tdClicks.appendChild(createTrendElement(trend.clicks ?? 0));
       tr.appendChild(tdClicks);
 
       // cpc (highlight)
@@ -614,6 +611,7 @@
       const tdConv = document.createElement("td");
       tdConv.className = "mono";
       tdConv.textContent = formatInt(r.conv);
+      tdConv.appendChild(createTrendElement(trend.conv ?? 0));
       tr.appendChild(tdConv);
 
       // cr (highlight)
@@ -626,15 +624,8 @@
       const tdCpa = document.createElement("td");
       tdCpa.className = "mono " + cellClass(r.cpa, "cpa");
       tdCpa.textContent = formatMoney(r.cpa, 2);
+      tdCpa.appendChild(createTrendElement(trend.cpa ?? 0, true));
       tr.appendChild(tdCpa);
-
-      // dynamics
-      const tdTrend = document.createElement("td");
-      const trendWrap = document.createElement("div");
-      trendWrap.className = "trendList";
-      trendWrap.innerHTML = buildTrendMarkup(demo.campaignDeltas[r.name]);
-      tdTrend.appendChild(trendWrap);
-      tr.appendChild(tdTrend);
 
       tbody.appendChild(tr);
     });
