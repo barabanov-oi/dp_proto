@@ -158,26 +158,16 @@
         </div>
       </section>
 
-      <section class="spoilers" aria-label="Детализация по каналам">
-        <details class="spoilerCard">
-          <summary>
-            <span>Поиск: скрытые плашки показателей</span>
-            <span class="tag" id="searchSummaryTag">Нажмите, чтобы показать</span>
-          </summary>
-          <div class="spoilerContent">
-            <div class="kpiGrid kpiGridInner" id="searchKpiGrid"></div>
-          </div>
-        </details>
-
-        <details class="spoilerCard">
-          <summary>
-            <span>РСЯ: скрытые плашки показателей</span>
-            <span class="tag" id="rsyaSummaryTag">Нажмите, чтобы показать</span>
-          </summary>
-          <div class="spoilerContent">
-            <div class="kpiGrid kpiGridInner" id="rsyaKpiGrid"></div>
-          </div>
-        </details>
+      <section class="channelSection" aria-label="Детализация по каналам">
+        <div class="channelSwitch" role="group" aria-label="Переключение показателей Поиск/РСЯ">
+          <button class="channelBtn active" data-channel="search" type="button">
+            Поиск: плашки показателей
+          </button>
+          <button class="channelBtn" data-channel="rsya" type="button">
+            РСЯ: плашки показателей
+          </button>
+        </div>
+        <div class="kpiGrid kpiGridInner" id="channelKpiGrid"></div>
       </section>
 
       <section class="grid">
@@ -188,7 +178,17 @@
               <h3>Динамика: расход и клики</h3>
               <div class="hint">по дням (демо), с двумя шкалами</div>
             </div>
-            <div class="tag" id="lastUpdateTag">Обновлено: —</div>
+            <div class="chartHeaderControls">
+              <div class="control small">
+                <label for="chartChannel">Канал</label>
+                <select id="chartChannel">
+                  <option value="all">Все</option>
+                  <option value="search">Поиск</option>
+                  <option value="rsya">РСЯ</option>
+                </select>
+              </div>
+              <div class="tag" id="lastUpdateTag">Обновлено: —</div>
+            </div>
           </div>
           <div class="chartWrap">
             <canvas id="chart" width="1200" height="320" aria-label="График расхода и кликов"></canvas>

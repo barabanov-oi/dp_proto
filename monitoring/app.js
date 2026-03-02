@@ -60,13 +60,37 @@
       { name: "Поиск — Категории", spend: 401225.76, impr: 615990, clicks: 14411, conv: 4820 },
       { name: "РСЯ — Интересы", spend: 277880.55, impr: 1005420, clicks: 7245, conv: 610 },
       { name: "Мастер кампаний", spend: 107554.38, impr: 250455, clicks: 4000, conv: 2804 }
-    ]
+    ],
+    channelDeltas: {
+      search: {
+        spend: +5.6,
+        ctr: +1.8,
+        cr: -2.1,
+        cpa: +8.4,
+        clicks: +2.9,
+        impressions: +4.7,
+        conversions: +6.2,
+        cpc: +3.1
+      },
+      rsya: {
+        spend: +8.9,
+        ctr: -1.4,
+        cr: -3.8,
+        cpa: +11.7,
+        clicks: +1.6,
+        impressions: +5.3,
+        conversions: +2.5,
+        cpc: +6.5
+      }
+    }
   };
 
   // --- State ---
   const state = {
     filter: "all",   // all | warn | bad
-    sortBy: "severity"
+    sortBy: "severity",
+    selectedChannelKpi: "search",
+    chartChannel: "all"
   };
 
   // --- Helpers ---
@@ -128,64 +152,74 @@
     }, { spend: 0, impressions: 0, clicks: 0, conversions: 0 });
   }
 
-  function renderHiddenKpi(containerId, summaryId, channelName, totals) {
-    const container = document.getElementById(containerId);
-    const summaryTag = document.getElementById(summaryId);
-    if (!container || !summaryTag) return;
+  function getChannelDaily(channel) {
+    const ratioByDay = demo.daily.map((_, index) => {
+      const wave = Math.sin(index / 2.4) * 0.06;
+      return Math.min(0.74, Math.max(0.58, 0.65 + wave));
+    });
+
+    return demo.daily.map((d, index) => {
+      const searchRatio = ratioByDay[index];
+      const rsyaRatio = 1 - searchRatio;
+      const ratio = channel === "search" ? searchRatio : rsyaRatio;
+      return {
+        date: d.date,
+        spend: d.spend * ratio,
+        clicks: Math.round(d.clicks * ratio)
+      };
+    });
+  }
+
+  function renderChannelKpi(channel) {
+    const container = document.getElementById("channelKpiGrid");
+    if (!container) return;
+
+    const isSearch = channel === "search";
+    const totals = aggregateByName(isSearch ? "Поиск" : "РСЯ");
+    const channelName = isSearch ? "Поиск" : "РСЯ";
+    const channelDelta = demo.channelDeltas[channel];
 
     const ctr = totals.impressions ? (totals.clicks / totals.impressions) * 100 : 0;
     const cpc = totals.clicks ? (totals.spend / totals.clicks) : 0;
     const cr = totals.clicks ? (totals.conversions / totals.clicks) * 100 : 0;
     const cpa = totals.conversions ? (totals.spend / totals.conversions) : 0;
 
-    summaryTag.textContent = `${channelName}: ${formatMoney(totals.spend, 0)} • CTR ${formatPct(ctr, 2)}`;
+    const cards = [
+      { label: "Расход", value: formatMoney(totals.spend, 0), delta: channelDelta.spend },
+      { label: "CTR", value: formatPct(ctr, 2), delta: channelDelta.ctr },
+      { label: "CR", value: formatPct(cr, 2), delta: channelDelta.cr },
+      { label: "CPA", value: formatMoney(cpa, 2), delta: channelDelta.cpa },
+      { label: "Клики", value: formatInt(totals.clicks), delta: channelDelta.clicks },
+      { label: "Показы", value: formatInt(totals.impressions), delta: channelDelta.impressions },
+      { label: "Конверсии", value: formatInt(totals.conversions), delta: channelDelta.conversions },
+      { label: "CPC", value: formatMoney(cpc, 2), delta: channelDelta.cpc }
+    ];
+
     container.innerHTML = `
-      <div class="kpiCard">
-        <div class="kpiLabel">Расход</div>
-        <div class="kpiHint">${channelName}</div>
-        <div class="kpiValue mono">${formatMoney(totals.spend, 0)}</div>
-      </div>
-      <div class="kpiCard">
-        <div class="kpiLabel">CTR</div>
-        <div class="kpiHint">${channelName}</div>
-        <div class="kpiValue mono">${formatPct(ctr, 2)}</div>
-      </div>
-      <div class="kpiCard">
-        <div class="kpiLabel">CR</div>
-        <div class="kpiHint">${channelName}</div>
-        <div class="kpiValue mono">${formatPct(cr, 2)}</div>
-      </div>
-      <div class="kpiCard">
-        <div class="kpiLabel">CPA</div>
-        <div class="kpiHint">${channelName}</div>
-        <div class="kpiValue mono">${formatMoney(cpa, 2)}</div>
-      </div>
-      <div class="kpiCard">
-        <div class="kpiLabel">Клики</div>
-        <div class="kpiHint">${channelName}</div>
-        <div class="kpiValue mono">${formatInt(totals.clicks)}</div>
-      </div>
-      <div class="kpiCard">
-        <div class="kpiLabel">Показы</div>
-        <div class="kpiHint">${channelName}</div>
-        <div class="kpiValue mono">${formatInt(totals.impressions)}</div>
-      </div>
-      <div class="kpiCard">
-        <div class="kpiLabel">Конверсии</div>
-        <div class="kpiHint">${channelName}</div>
-        <div class="kpiValue mono">${formatInt(totals.conversions)}</div>
-      </div>
-      <div class="kpiCard">
-        <div class="kpiLabel">CPC</div>
-        <div class="kpiHint">${channelName}</div>
-        <div class="kpiValue mono">${formatMoney(cpc, 2)}</div>
-      </div>
+      ${cards.map((card) => `
+        <div class="kpiCard">
+          <div class="kpiTop">
+            <div>
+              <div class="kpiLabel">${card.label}</div>
+              <div class="kpiHint">${channelName}</div>
+            </div>
+            <span class="delta" data-delta="${card.delta}"></span>
+          </div>
+          <div class="kpiValue mono">${card.value}</div>
+        </div>
+      `).join("")}
     `;
+
+    container.querySelectorAll("[data-delta]").forEach((el) => {
+      setDelta(el, Number(el.dataset.delta));
+    });
   }
 
-  function renderSpoilers() {
-    renderHiddenKpi("searchKpiGrid", "searchSummaryTag", "Поиск", aggregateByName("Поиск"));
-    renderHiddenKpi("rsyaKpiGrid", "rsyaSummaryTag", "РСЯ", aggregateByName("РСЯ"));
+  function renderChannelSwitch() {
+    document.querySelectorAll(".channelBtn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.channel === state.selectedChannelKpi);
+    });
+    renderChannelKpi(state.selectedChannelKpi);
   }
 
   // --- Alerts render (3 сигнала) ---
@@ -258,7 +292,7 @@
     const plotW = w - pad.l - pad.r;
     const plotH = h - pad.t - pad.b;
 
-    const points = demo.daily;
+    const points = state.chartChannel === "all" ? demo.daily : getChannelDaily(state.chartChannel);
     const spend = points.map((p) => p.spend);
     const clicks = points.map((p) => p.clicks);
     const maxSpend = Math.max(...spend) * 1.08;
@@ -349,7 +383,11 @@
     // legend
     ctx.fillStyle = "rgba(255,255,255,0.75)";
     ctx.font = "12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial";
-    ctx.fillText("▮ Расход (левая шкала)", pad.l, 16);
+    const channelLabel = state.chartChannel === "all"
+      ? "все каналы"
+      : state.chartChannel === "search" ? "поиск" : "РСЯ";
+
+    ctx.fillText(`▮ Расход (${channelLabel})`, pad.l, 16);
     ctx.fillStyle = "rgba(34,197,94,0.95)";
     ctx.fillText("— Клики (правая шкала)", pad.l + 180, 16);
   }
@@ -605,14 +643,33 @@
     }
   }
 
+  function bindChannelControls() {
+    document.querySelectorAll(".channelBtn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.selectedChannelKpi = btn.dataset.channel || "search";
+        renderChannelSwitch();
+      });
+    });
+
+    const chartChannel = document.getElementById("chartChannel");
+    if (chartChannel) {
+      chartChannel.value = state.chartChannel;
+      chartChannel.addEventListener("change", () => {
+        state.chartChannel = chartChannel.value;
+        drawChart();
+      });
+    }
+  }
+
   function init() {
     setDefaultDates();
     renderKPI();
     renderAlerts();
     drawChart();
+    bindChannelControls();
     bindCampaignControls();
     renderCampaigns();
-    renderSpoilers();
+    renderChannelSwitch();
   }
 
   window.addEventListener("resize", drawChart);
@@ -622,7 +679,7 @@
     renderAlerts();
     drawChart();
     renderCampaigns();
-    renderSpoilers();
+    renderChannelSwitch();
   });
 
   init();
