@@ -458,6 +458,29 @@ canvas{ width:100%; height:260px; display:block; }
 
 .campaignsTable tbody tr:hover td{ background: rgba(255,255,255,.03); }
 .campaignsTable tbody tr:last-child td{ border-bottom:none; }
+.campaignRow{ cursor:pointer; }
+.campaignDetails.hidden{ display:none; }
+.campaignDetails td{
+  background: rgba(0,0,0,.18);
+}
+.campaignDetailsWrap{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.criticalList{
+  margin:8px 0 0;
+  padding-left:16px;
+  color: rgba(255,255,255,.8);
+  font-size:12px;
+}
+.btnTiny{
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:12px;
+}
 
 /* Cell highlights */
 .cellOk{

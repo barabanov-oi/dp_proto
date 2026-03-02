@@ -3,6 +3,7 @@
   const demo = {
     periodDays: 14,
     totals: {
+      balance: 483920.45,
       spend: 1339902.09,
       impressions: 3388435,
       clicks: 64150,
@@ -127,6 +128,7 @@
     const cpa = t.conversions ? (t.spend / t.conversions) : 0;
 
     document.getElementById("kpiSpend").textContent = formatMoney(t.spend, 0);
+    document.getElementById("kpiBalance").textContent = formatMoney(t.balance, 2);
     document.getElementById("kpiImpr").textContent = formatInt(t.impressions);
     document.getElementById("kpiCtr").textContent = formatPct(ctr, 2);
     document.getElementById("kpiClicks").textContent = formatInt(t.clicks);
@@ -552,6 +554,7 @@
 
     rows.forEach((r) => {
       const tr = document.createElement("tr");
+      tr.className = "campaignRow";
       const trend = demo.campaignDeltas[r.name] || {};
 
       // name
@@ -581,13 +584,6 @@
       tdSpend.appendChild(bar);
 
       tr.appendChild(tdSpend);
-
-      // impr
-      const tdImpr = document.createElement("td");
-      tdImpr.className = "mono";
-      tdImpr.textContent = formatInt(r.impr);
-      tdImpr.appendChild(createTrendElement(trend.impr ?? 0));
-      tr.appendChild(tdImpr);
 
       // ctr (highlight)
       const tdCtr = document.createElement("td");
@@ -632,6 +628,47 @@
       tr.appendChild(tdCpa);
 
       tbody.appendChild(tr);
+
+      const detailsTr = document.createElement("tr");
+      detailsTr.className = "campaignDetails hidden";
+      const detailsTd = document.createElement("td");
+      detailsTd.colSpan = 9;
+
+      const detailsWrap = document.createElement("div");
+      detailsWrap.className = "campaignDetailsWrap";
+
+      const title = document.createElement("b");
+      title.textContent = "Критичные показатели";
+      detailsWrap.appendChild(title);
+
+      const list = document.createElement("ul");
+      list.className = "criticalList";
+      if (r.flags.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "Критичных отклонений нет";
+        list.appendChild(li);
+      } else {
+        r.flags.forEach((flag) => {
+          const li = document.createElement("li");
+          li.textContent = flag.text;
+          list.appendChild(li);
+        });
+      }
+
+      const reviewBtn = document.createElement("button");
+      reviewBtn.type = "button";
+      reviewBtn.className = "btn btnTiny";
+      reviewBtn.textContent = "Обзор";
+
+      detailsWrap.appendChild(list);
+      detailsWrap.appendChild(reviewBtn);
+      detailsTd.appendChild(detailsWrap);
+      detailsTr.appendChild(detailsTd);
+      tbody.appendChild(detailsTr);
+
+      tr.addEventListener("click", () => {
+        detailsTr.classList.toggle("hidden");
+      });
     });
 
     // tag
