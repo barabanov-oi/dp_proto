@@ -467,17 +467,17 @@
 
   function buildFlags({ ctr, cpc, cr, cpa }) {
     const flags = [];
-    if (ctr < thresholds.ctrBad) flags.push({ level: "bad", text: "CTR низкий" });
-    else if (ctr < thresholds.ctrWarn) flags.push({ level: "warn", text: "CTR проседает" });
+    if (ctr < thresholds.ctrBad) flags.push({ metric: "ctr", level: "bad", text: "CTR низкий" });
+    else if (ctr < thresholds.ctrWarn) flags.push({ metric: "ctr", level: "warn", text: "CTR проседает" });
 
-    if (cpc > thresholds.cpcBad) flags.push({ level: "bad", text: "CPC высокий" });
-    else if (cpc > thresholds.cpcWarn) flags.push({ level: "warn", text: "CPC растёт" });
+    if (cpc > thresholds.cpcBad) flags.push({ metric: "cpc", level: "bad", text: "CPC высокий" });
+    else if (cpc > thresholds.cpcWarn) flags.push({ metric: "cpc", level: "warn", text: "CPC растёт" });
 
-    if (cr < thresholds.crBad) flags.push({ level: "bad", text: "CR низкий" });
-    else if (cr < thresholds.crWarn) flags.push({ level: "warn", text: "CR проседает" });
+    if (cr < thresholds.crBad) flags.push({ metric: "cr", level: "bad", text: "CR низкий" });
+    else if (cr < thresholds.crWarn) flags.push({ metric: "cr", level: "warn", text: "CR проседает" });
 
-    if (cpa > thresholds.cpaBad) flags.push({ level: "bad", text: "CPA высокий" });
-    else if (cpa > thresholds.cpaWarn) flags.push({ level: "warn", text: "CPA растёт" });
+    if (cpa > thresholds.cpaBad) flags.push({ metric: "cpa", level: "bad", text: "CPA высокий" });
+    else if (cpa > thresholds.cpaWarn) flags.push({ metric: "cpa", level: "warn", text: "CPA растёт" });
 
     return flags;
   }
@@ -656,17 +656,19 @@
       const metrics = document.createElement("div");
       metrics.className = "detailMetrics";
       const metricItems = [
-        { label: "Расход", value: formatMoney(r.spend, 2), trend: trend.spend ?? 0, inverse: true },
-        { label: "CTR", value: formatPct(r.ctr, 2), trend: trend.ctr ?? 0, inverse: false },
-        { label: "Клики", value: formatInt(r.clicks), trend: trend.clicks ?? 0, inverse: false },
-        { label: "CPC", value: formatMoney(r.cpc, 2), trend: trend.cpc ?? 0, inverse: true },
-        { label: "Конверсии", value: formatInt(r.conv), trend: trend.conv ?? 0, inverse: false },
-        { label: "CR", value: formatPct(r.cr, 2), trend: trend.cr ?? 0, inverse: false },
-        { label: "CPA", value: formatMoney(r.cpa, 2), trend: trend.cpa ?? 0, inverse: true }
+        { metric: "ctr", label: "CTR", value: formatPct(r.ctr, 2), trend: trend.ctr ?? 0, inverse: false },
+        { metric: "cpc", label: "CPC", value: formatMoney(r.cpc, 2), trend: trend.cpc ?? 0, inverse: true },
+        { metric: "cr", label: "CR", value: formatPct(r.cr, 2), trend: trend.cr ?? 0, inverse: false },
+        { metric: "cpa", label: "CPA", value: formatMoney(r.cpa, 2), trend: trend.cpa ?? 0, inverse: true }
       ];
-      metricItems.forEach((item) => {
+
+      const metricFlags = new Map(r.flags.map((flag) => [flag.metric, flag]));
+      const flaggedMetrics = metricItems.filter((item) => metricFlags.has(item.metric));
+
+      flaggedMetrics.forEach((item) => {
+        const flag = metricFlags.get(item.metric);
         const card = document.createElement("div");
-        card.className = "detailMetricCard";
+        card.className = "detailMetricCard " + flag.level;
 
         const label = document.createElement("span");
         label.className = "detailMetricLabel";
@@ -677,10 +679,22 @@
         value.textContent = item.value;
         value.appendChild(createTrendElement(item.trend, item.inverse));
 
+        const warning = document.createElement("small");
+        warning.className = "detailMetricWarning";
+        warning.textContent = `⚠ ${flag.text}: требуется проверка.`;
+
         card.appendChild(label);
         card.appendChild(value);
+        card.appendChild(warning);
         metrics.appendChild(card);
       });
+
+      if (flaggedMetrics.length === 0) {
+        const noProblems = document.createElement("div");
+        noProblems.className = "detailMetricEmpty";
+        noProblems.textContent = "Отклонений по контролируемым показателям не обнаружено.";
+        metrics.appendChild(noProblems);
+      }
 
       const alerts = document.createElement("div");
       alerts.className = "alertsRect";
