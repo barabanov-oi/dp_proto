@@ -61,6 +61,13 @@
       { name: "РСЯ — Интересы", spend: 277880.55, impr: 1005420, clicks: 7245, conv: 610 },
       { name: "Мастер кампаний", spend: 107554.38, impr: 250455, clicks: 4000, conv: 2804 }
     ],
+    campaignDeltas: {
+      "Поиск — Бренд": { spend: +4.1, clicks: +6.3, conv: +5.4, cpa: -1.2 },
+      "РСЯ — Ремаркетинг": { spend: +7.8, clicks: +3.2, conv: -2.4, cpa: +10.3 },
+      "Поиск — Категории": { spend: +2.9, clicks: +4.5, conv: +2.1, cpa: +0.8 },
+      "РСЯ — Интересы": { spend: -1.7, clicks: -2.9, conv: -4.8, cpa: +6.6 },
+      "Мастер кампаний": { spend: +5.5, clicks: +2.8, conv: +9.7, cpa: -3.9 }
+    },
     channelDeltas: {
       search: {
         spend: +5.6,
@@ -500,6 +507,28 @@
     return copy;
   }
 
+  function trendClass(pct, inverse = false) {
+    const effective = inverse ? -pct : pct;
+    if (effective >= 0) return "good";
+    if (effective > -3) return "warn";
+    return "bad";
+  }
+
+  function buildTrendMarkup(trend = {}) {
+    const items = [
+      { label: "Расход", value: trend.spend ?? 0, inverse: true },
+      { label: "Клики", value: trend.clicks ?? 0, inverse: false },
+      { label: "Конв.", value: trend.conv ?? 0, inverse: false },
+      { label: "CPA", value: trend.cpa ?? 0, inverse: true }
+    ];
+
+    return items.map((item) => {
+      const sign = item.value >= 0 ? "▲" : "▼";
+      const cls = trendClass(item.value, item.inverse);
+      return `<span class="trendBadge ${cls}">${item.label} ${sign} ${Math.abs(item.value).toFixed(1)}%</span>`;
+    }).join("");
+  }
+
   function renderCampaigns() {
     const tbody = document.getElementById("campaignsBody");
     if (!tbody) return;
@@ -599,33 +628,13 @@
       tdCpa.textContent = formatMoney(r.cpa, 2);
       tr.appendChild(tdCpa);
 
-      // critical flags
-      const tdCrit = document.createElement("td");
-      const wrap = document.createElement("div");
-      wrap.className = "critList";
-
-      if (r.flags.length === 0) {
-        const b = document.createElement("span");
-        b.className = "critBadge";
-        b.textContent = "—";
-        wrap.appendChild(b);
-      } else {
-        r.flags.slice(0, 4).forEach((f) => {
-          const b = document.createElement("span");
-          b.className = "critBadge " + f.level;
-          b.textContent = f.text;
-          wrap.appendChild(b);
-        });
-        if (r.flags.length > 4) {
-          const more = document.createElement("span");
-          more.className = "critBadge warn";
-          more.textContent = `+${r.flags.length - 4}`;
-          wrap.appendChild(more);
-        }
-      }
-
-      tdCrit.appendChild(wrap);
-      tr.appendChild(tdCrit);
+      // dynamics
+      const tdTrend = document.createElement("td");
+      const trendWrap = document.createElement("div");
+      trendWrap.className = "trendList";
+      trendWrap.innerHTML = buildTrendMarkup(demo.campaignDeltas[r.name]);
+      tdTrend.appendChild(trendWrap);
+      tr.appendChild(tdTrend);
 
       tbody.appendChild(tr);
     });

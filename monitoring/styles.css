@@ -496,13 +496,13 @@ canvas{ width:100%; height:260px; display:block; }
   border-radius:999px;
 }
 
-/* Critical list */
-.critList{
+/* Dynamics list */
+.trendList{
   display:flex;
   flex-wrap:wrap;
   gap:6px;
 }
-.critBadge{
+.trendBadge{
   display:inline-flex;
   align-items:center;
   gap:6px;
@@ -512,13 +512,17 @@ canvas{ width:100%; height:260px; display:block; }
   border:1px solid rgba(255,255,255,.10);
   background: rgba(255,255,255,.03);
 }
-.critBadge.bad{
-  border-color: rgba(239,68,68,.35);
-  background: rgba(239,68,68,.10);
+.trendBadge.good{
+  border-color: rgba(34,197,94,.35);
+  background: rgba(34,197,94,.10);
 }
-.critBadge.warn{
+.trendBadge.warn{
   border-color: rgba(245,158,11,.35);
   background: rgba(245,158,11,.10);
+}
+.trendBadge.bad{
+  border-color: rgba(239,68,68,.35);
+  background: rgba(239,68,68,.10);
 }
 
 /* Legend */
