@@ -117,6 +117,77 @@
       "Обновлено: " + new Date().toLocaleString("ru-RU");
   }
 
+  function aggregateByName(part) {
+    const rows = demo.campaigns.filter((c) => c.name.includes(part));
+    return rows.reduce((acc, c) => {
+      acc.spend += c.spend;
+      acc.impressions += c.impr;
+      acc.clicks += c.clicks;
+      acc.conversions += c.conv;
+      return acc;
+    }, { spend: 0, impressions: 0, clicks: 0, conversions: 0 });
+  }
+
+  function renderHiddenKpi(containerId, summaryId, channelName, totals) {
+    const container = document.getElementById(containerId);
+    const summaryTag = document.getElementById(summaryId);
+    if (!container || !summaryTag) return;
+
+    const ctr = totals.impressions ? (totals.clicks / totals.impressions) * 100 : 0;
+    const cpc = totals.clicks ? (totals.spend / totals.clicks) : 0;
+    const cr = totals.clicks ? (totals.conversions / totals.clicks) * 100 : 0;
+    const cpa = totals.conversions ? (totals.spend / totals.conversions) : 0;
+
+    summaryTag.textContent = `${channelName}: ${formatMoney(totals.spend, 0)} • CTR ${formatPct(ctr, 2)}`;
+    container.innerHTML = `
+      <div class="kpiCard">
+        <div class="kpiLabel">Расход</div>
+        <div class="kpiHint">${channelName}</div>
+        <div class="kpiValue mono">${formatMoney(totals.spend, 0)}</div>
+      </div>
+      <div class="kpiCard">
+        <div class="kpiLabel">CTR</div>
+        <div class="kpiHint">${channelName}</div>
+        <div class="kpiValue mono">${formatPct(ctr, 2)}</div>
+      </div>
+      <div class="kpiCard">
+        <div class="kpiLabel">CR</div>
+        <div class="kpiHint">${channelName}</div>
+        <div class="kpiValue mono">${formatPct(cr, 2)}</div>
+      </div>
+      <div class="kpiCard">
+        <div class="kpiLabel">CPA</div>
+        <div class="kpiHint">${channelName}</div>
+        <div class="kpiValue mono">${formatMoney(cpa, 2)}</div>
+      </div>
+      <div class="kpiCard">
+        <div class="kpiLabel">Клики</div>
+        <div class="kpiHint">${channelName}</div>
+        <div class="kpiValue mono">${formatInt(totals.clicks)}</div>
+      </div>
+      <div class="kpiCard">
+        <div class="kpiLabel">Показы</div>
+        <div class="kpiHint">${channelName}</div>
+        <div class="kpiValue mono">${formatInt(totals.impressions)}</div>
+      </div>
+      <div class="kpiCard">
+        <div class="kpiLabel">Конверсии</div>
+        <div class="kpiHint">${channelName}</div>
+        <div class="kpiValue mono">${formatInt(totals.conversions)}</div>
+      </div>
+      <div class="kpiCard">
+        <div class="kpiLabel">CPC</div>
+        <div class="kpiHint">${channelName}</div>
+        <div class="kpiValue mono">${formatMoney(cpc, 2)}</div>
+      </div>
+    `;
+  }
+
+  function renderSpoilers() {
+    renderHiddenKpi("searchKpiGrid", "searchSummaryTag", "Поиск", aggregateByName("Поиск"));
+    renderHiddenKpi("rsyaKpiGrid", "rsyaSummaryTag", "РСЯ", aggregateByName("РСЯ"));
+  }
+
   // --- Alerts render (3 сигнала) ---
   function renderAlerts() {
     const ul = document.getElementById("alertsList");
@@ -541,6 +612,7 @@
     drawChart();
     bindCampaignControls();
     renderCampaigns();
+    renderSpoilers();
   }
 
   window.addEventListener("resize", drawChart);
@@ -550,6 +622,7 @@
     renderAlerts();
     drawChart();
     renderCampaigns();
+    renderSpoilers();
   });
 
   init();
