@@ -62,11 +62,11 @@
       { name: "Мастер кампаний", spend: 107554.38, impr: 250455, clicks: 4000, conv: 2804 }
     ],
     campaignDeltas: {
-      "Поиск — Бренд": { spend: +4.1, clicks: +6.3, conv: +5.4, cpa: -1.2 },
-      "РСЯ — Ремаркетинг": { spend: +7.8, clicks: +3.2, conv: -2.4, cpa: +10.3 },
-      "Поиск — Категории": { spend: +2.9, clicks: +4.5, conv: +2.1, cpa: +0.8 },
-      "РСЯ — Интересы": { spend: -1.7, clicks: -2.9, conv: -4.8, cpa: +6.6 },
-      "Мастер кампаний": { spend: +5.5, clicks: +2.8, conv: +9.7, cpa: -3.9 }
+      "Поиск — Бренд": { spend: +4.1, impr: +3.8, ctr: +2.4, clicks: +6.3, cpc: -1.7, conv: +5.4, cr: +1.9, cpa: -1.2 },
+      "РСЯ — Ремаркетинг": { spend: +7.8, impr: +5.1, ctr: -1.2, clicks: +3.2, cpc: +4.4, conv: -2.4, cr: -4.8, cpa: +10.3 },
+      "Поиск — Категории": { spend: +2.9, impr: +1.7, ctr: +0.9, clicks: +4.5, cpc: -0.8, conv: +2.1, cr: -1.1, cpa: +0.8 },
+      "РСЯ — Интересы": { spend: -1.7, impr: -2.6, ctr: -0.5, clicks: -2.9, cpc: +1.2, conv: -4.8, cr: -2.0, cpa: +6.6 },
+      "Мастер кампаний": { spend: +5.5, impr: +4.4, ctr: +1.3, clicks: +2.8, cpc: +2.1, conv: +9.7, cr: +3.5, cpa: -3.9 }
     },
     channelDeltas: {
       search: {
@@ -586,12 +586,14 @@
       const tdImpr = document.createElement("td");
       tdImpr.className = "mono";
       tdImpr.textContent = formatInt(r.impr);
+      tdImpr.appendChild(createTrendElement(trend.impr ?? 0));
       tr.appendChild(tdImpr);
 
       // ctr (highlight)
       const tdCtr = document.createElement("td");
       tdCtr.className = "mono " + cellClass(r.ctr, "ctr");
       tdCtr.textContent = formatPct(r.ctr, 2);
+      tdCtr.appendChild(createTrendElement(trend.ctr ?? 0));
       tr.appendChild(tdCtr);
 
       // clicks
@@ -605,6 +607,7 @@
       const tdCpc = document.createElement("td");
       tdCpc.className = "mono " + cellClass(r.cpc, "cpc");
       tdCpc.textContent = formatMoney(r.cpc, 2);
+      tdCpc.appendChild(createTrendElement(trend.cpc ?? 0, true));
       tr.appendChild(tdCpc);
 
       // conv
@@ -618,6 +621,7 @@
       const tdCr = document.createElement("td");
       tdCr.className = "mono " + cellClass(r.cr, "cr");
       tdCr.textContent = formatPct(r.cr, 2);
+      tdCr.appendChild(createTrendElement(trend.cr ?? 0));
       tr.appendChild(tdCr);
 
       // cpa (highlight)
