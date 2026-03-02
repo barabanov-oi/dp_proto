@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DirectPulse — Мониторинг</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>DirectPulse <span class="sub">Мониторинг Яндекс Директа</span></h1>
+        </div>
+      </div>
+
+      <div class="menuTitle">Мониторы</div>
+      <nav class="nav" aria-label="Главное меню">
+        <a href="#" class="active"><span class="dot"></span>Сводка</a>
+        <a href="#"><span class="dot"></span>Мониторинг</a>
+        <a href="#"><span class="dot"></span>Статистика</a>
+        <a href="#"><span class="dot"></span>Аудит</a>
+        <a href="#"><span class="dot"></span>Wordstat</a>
+        <a href="#"><span class="dot"></span>Конкуренты</a>
+        <a href="#"><span class="dot"></span>Анализ рынка</a>
+        <a href="#"><span class="dot"></span>Anti-Fraud</a>
+        <a href="#"><span class="dot"></span>Уведомления</a>
+      </nav>
+
+      <div class="sidebarFooter">
+        <div><b>Демо-режим</b></div>
+        <div class="muted" style="margin-top:6px;">
+          Данные примерные. Подключите аккаунт, чтобы получать реальные метрики по API.
+        </div>
+        <div class="pill"><span class="k"></span><span>Статус: OK</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="titleWrap">
+          <h2>Мониторинг базовых показателей</h2>
+          <p>Сводный контроль расходов, трафика и эффективности по аккаунту. Демо-данные за последние 14 дней.</p>
+        </div>
+
+        <div class="controls">
+          <div class="control">
+            <label for="account">Аккаунт</label>
+            <select id="account">
+              <option>vivion.la (demo)</option>
+              <option>client-2 (demo)</option>
+              <option>client-3 (demo)</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label for="from">Период</label>
+            <input id="from" type="date" />
+            <span class="sep">—</span>
+            <input id="to" type="date" />
+          </div>
+
+          <button class="btn" id="refreshBtn" type="button">Обновить</button>
+        </div>
+      </div>
+
+      <!-- KPI: 8 плиток, 4 в ряд -->
+      <section class="kpiGrid" aria-label="Показатели">
+        <div class="kpiCard">
+          <div class="kpiTop">
+            <div>
+              <div class="kpiLabel">Расход</div>
+              <div class="kpiHint">за период</div>
+            </div>
+            <span class="delta warn" id="deltaSpend">▲ 0.0%</span>
+          </div>
+          <div class="kpiValue mono" id="kpiSpend">—</div>
+        </div>
+
+        <div class="kpiCard">
+          <div class="kpiTop">
+            <div>
+              <div class="kpiLabel">Показы</div>
+              <div class="kpiHint">за период</div>
+            </div>
+            <span class="delta good" id="deltaImpr">▲ 0.0%</span>
+          </div>
+          <div class="kpiValue mono" id="kpiImpr">—</div>
+        </div>
+
+        <div class="kpiCard">
+          <div class="kpiTop">
+            <div>
+              <div class="kpiLabel">CTR</div>
+              <div class="kpiHint">средний</div>
+            </div>
+            <span class="delta good" id="deltaCtr">▲ 0.0%</span>
+          </div>
+          <div class="kpiValue mono" id="kpiCtr">—</div>
+        </div>
+
+        <div class="kpiCard">
+          <div class="kpiTop">
+            <div>
+              <div class="kpiLabel">Клики</div>
+              <div class="kpiHint">за период</div>
+            </div>
+            <span class="delta good" id="deltaClicks">▲ 0.0%</span>
+          </div>
+          <div class="kpiValue mono" id="kpiClicks">—</div>
+        </div>
+
+        <div class="kpiCard">
+          <div class="kpiTop">
+            <div>
+              <div class="kpiLabel">CPC</div>
+              <div class="kpiHint">средний</div>
+            </div>
+            <span class="delta warn" id="deltaCpc">▲ 0.0%</span>
+          </div>
+          <div class="kpiValue mono" id="kpiCpc">—</div>
+        </div>
+
+        <div class="kpiCard">
+          <div class="kpiTop">
+            <div>
+              <div class="kpiLabel">Конверсии</div>
+              <div class="kpiHint">за период</div>
+            </div>
+            <span class="delta good" id="deltaConv">▲ 0.0%</span>
+          </div>
+          <div class="kpiValue mono" id="kpiConv">—</div>
+        </div>
+
+        <div class="kpiCard">
+          <div class="kpiTop">
+            <div>
+              <div class="kpiLabel">CR</div>
+              <div class="kpiHint">средний</div>
+            </div>
+            <span class="delta bad" id="deltaCr">▲ 0.0%</span>
+          </div>
+          <div class="kpiValue mono" id="kpiCr">—</div>
+        </div>
+
+        <div class="kpiCard">
+          <div class="kpiTop">
+            <div>
+              <div class="kpiLabel">CPA</div>
+              <div class="kpiHint">средний</div>
+            </div>
+            <span class="delta bad" id="deltaCpa">▲ 0.0%</span>
+          </div>
+          <div class="kpiValue mono" id="kpiCpa">—</div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <!-- Chart -->
+        <div class="card span-8">
+          <div class="cardHeader">
+            <div>
+              <h3>Динамика: расход и клики</h3>
+              <div class="hint">по дням (демо), с двумя шкалами</div>
+            </div>
+            <div class="tag" id="lastUpdateTag">Обновлено: —</div>
+          </div>
+          <div class="chartWrap">
+            <canvas id="chart" width="1200" height="320" aria-label="График расхода и кликов"></canvas>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="card span-4">
+          <div class="cardHeader">
+            <div>
+              <h3>Сигналы мониторинга</h3>
+              <div class="hint">что требует внимания</div>
+            </div>
+            <span class="tag warn" id="alertsCount">3 сигнала</span>
+          </div>
+          <div class="cardBody">
+            <ul class="statusList" id="alertsList"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Кампании: таблица на всю ширину + сортировка/фильтр -->
+      <section class="grid" style="margin-top:14px;">
+        <div class="card span-12">
+          <div class="cardHeader">
+            <div>
+              <h3>Кампании</h3>
+              <div class="hint">сводка по ключевым показателям, подсветка критичных + фильтр/сортировка</div>
+            </div>
+
+            <div class="tableControls">
+              <div class="segmented" role="group" aria-label="Фильтр кампаний">
+                <button class="segBtn active" data-filter="all" type="button">Все</button>
+                <button class="segBtn" data-filter="warn" type="button">Внимание</button>
+                <button class="segBtn" data-filter="bad" type="button">Критично</button>
+              </div>
+
+              <div class="control small">
+                <label for="sortBy">Сортировка</label>
+                <select id="sortBy">
+                  <option value="severity">По критичности</option>
+                  <option value="spend_desc">Расход (↓)</option>
+                  <option value="cpa_desc">CPA (↓)</option>
+                  <option value="cr_asc">CR (↑ хуже)</option>
+                  <option value="ctr_asc">CTR (↑ хуже)</option>
+                </select>
+              </div>
+
+              <div class="tag" id="campaignsTag">всего: —</div>
+            </div>
+          </div>
+
+          <div class="cardBody">
+            <div class="tableWrap">
+              <table class="campaignsTable">
+                <thead>
+                  <tr>
+                    <th>Кампания</th>
+                    <th>Статус</th>
+                    <th class="mono">Расход, ₽</th>
+                    <th class="mono">Показы</th>
+                    <th class="mono">CTR</th>
+                    <th class="mono">Клики</th>
+                    <th class="mono">CPC, ₽</th>
+                    <th class="mono">Конверсии</th>
+                    <th class="mono">CR</th>
+                    <th class="mono">CPA, ₽</th>
+                    <th>Критично</th>
+                  </tr>
+                </thead>
+                <tbody id="campaignsBody"></tbody>
+              </table>
+            </div>
+
+            <div class="tableLegend">
+              <span class="legendItem"><span class="chip good"></span>OK</span>
+              <span class="legendItem"><span class="chip warn"></span>Внимание</span>
+              <span class="legendItem"><span class="chip bad"></span>Критично</span>
+              <span class="legendHint">Пороговые значения — демо (замените на свои правила мониторинга).</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
