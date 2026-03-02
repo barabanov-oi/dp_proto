@@ -160,14 +160,14 @@
 
       <section class="channelSection" aria-label="Детализация по каналам">
         <div class="channelSwitch" role="group" aria-label="Переключение показателей Поиск/РСЯ">
-          <button class="channelBtn active" data-channel="search" type="button">
+          <button class="channelBtn" data-channel="search" type="button" aria-expanded="false">
             Поиск: плашки показателей
           </button>
-          <button class="channelBtn" data-channel="rsya" type="button">
+          <button class="channelBtn" data-channel="rsya" type="button" aria-expanded="false">
             РСЯ: плашки показателей
           </button>
         </div>
-        <div class="kpiGrid kpiGridInner" id="channelKpiGrid"></div>
+        <div class="kpiGrid kpiGridInner hidden" id="channelKpiGrid"></div>
       </section>
 
       <section class="grid">

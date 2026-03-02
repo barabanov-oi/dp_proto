@@ -89,7 +89,7 @@
   const state = {
     filter: "all",   // all | warn | bad
     sortBy: "severity",
-    selectedChannelKpi: "search",
+    selectedChannelKpi: null,
     chartChannel: "all"
   };
 
@@ -216,9 +216,23 @@
   }
 
   function renderChannelSwitch() {
+    const grid = document.getElementById("channelKpiGrid");
+
     document.querySelectorAll(".channelBtn").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.channel === state.selectedChannelKpi);
+      const isActive = btn.dataset.channel === state.selectedChannelKpi;
+      btn.classList.toggle("active", isActive);
+      btn.setAttribute("aria-expanded", isActive ? "true" : "false");
     });
+
+    if (!grid) return;
+
+    if (!state.selectedChannelKpi) {
+      grid.classList.add("hidden");
+      grid.innerHTML = "";
+      return;
+    }
+
+    grid.classList.remove("hidden");
     renderChannelKpi(state.selectedChannelKpi);
   }
 
@@ -646,7 +660,8 @@
   function bindChannelControls() {
     document.querySelectorAll(".channelBtn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        state.selectedChannelKpi = btn.dataset.channel || "search";
+        const clickedChannel = btn.dataset.channel || "search";
+        state.selectedChannelKpi = state.selectedChannelKpi === clickedChannel ? null : clickedChannel;
         renderChannelSwitch();
       });
     });

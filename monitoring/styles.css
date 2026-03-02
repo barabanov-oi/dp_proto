@@ -269,6 +269,9 @@ select, input[type="date"]{
 .kpiGridInner{
   margin-bottom:0;
 }
+.kpiGridInner.hidden{
+  display:none;
+}
 
 /* Cards grid below */
 .grid{
