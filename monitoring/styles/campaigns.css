@@ -264,3 +264,43 @@
   .sidebarFooter{ position:relative; left:auto; right:auto; bottom:auto; margin-top:12px; }
   .controls{ justify-content:flex-start; }
 }
+
+
+@media (max-width: 860px){
+  .campaignsTable{ min-width:0; }
+  .campaignsTable thead{ display:none; }
+  .campaignsTable tbody,
+  .campaignsTable tr,
+  .campaignsTable td{ display:block; width:100%; }
+  .campaignRow{
+    padding:10px;
+    margin-bottom:10px;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;
+    background: rgba(255,255,255,.03);
+  }
+  .campaignsTable tbody tr.campaignRow td{
+    border-bottom:none;
+    white-space:normal;
+    padding:6px 0;
+  }
+  .campaignNameCell{
+    font-size:14px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .campaignsTable tbody tr.campaignRow td:not(.campaignNameCell){
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    font-size:12px;
+  }
+  .campaignsTable tbody tr.campaignRow td:not(.campaignNameCell)::before{
+    content: attr(data-label);
+    color: rgba(255,255,255,.62);
+    font-size:11px;
+    font-weight:600;
+  }
+  .campaignDetails td{ padding:10px; }
+}

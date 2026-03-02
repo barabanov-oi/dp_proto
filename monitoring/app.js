@@ -118,7 +118,8 @@ function setDelta(el, pct) {
     filter: "all",   // all | warn | bad
     sortBy: "severity",
     selectedChannelKpi: null,
-    chartChannel: "all"
+    chartChannel: "all",
+    chartMode: "traffic"
   };
 
 
@@ -148,6 +149,11 @@ function setDelta(el, pct) {
     setDelta(document.getElementById("deltaConv"), demo.deltas.conv);
     setDelta(document.getElementById("deltaCr"), demo.deltas.cr);
     setDelta(document.getElementById("deltaCpa"), demo.deltas.cpa);
+
+    document.querySelectorAll(".kpiCard").forEach((card) => {
+      const delta = card.querySelector(".delta");
+      card.classList.toggle("kpiCritical", Boolean(delta && delta.classList.contains("bad")));
+    });
 
     document.getElementById("lastUpdateTag").textContent =
       "Обновлено: " + new Date().toLocaleString("ru-RU");
@@ -319,6 +325,38 @@ function setDelta(el, pct) {
     return `${dd}.${mm}`;
   }
 
+  function getChartSeries() {
+    const points = state.chartChannel === "all" ? demo.daily : getChannelDaily(state.chartChannel);
+    if (state.chartMode === "traffic") {
+      return {
+        points,
+        left: points.map((p) => p.spend),
+        right: points.map((p) => p.clicks),
+        leftLabel: "Расход",
+        rightLabel: "Клики",
+        leftFormatter: (val) => Math.round(val / 1000) + "k",
+        rightFormatter: (val) => Math.round(val)
+      };
+    }
+
+    const converted = points.map((p, index) => {
+      const wave = 0.17 + Math.sin(index / 2.7) * 0.03;
+      const conv = Math.max(1, Math.round(p.clicks * wave));
+      const cpa = conv ? (p.spend / conv) : 0;
+      return { ...p, conv, cpa };
+    });
+
+    return {
+      points: converted,
+      left: converted.map((p) => p.conv),
+      right: converted.map((p) => p.cpa),
+      leftLabel: "Конверсии",
+      rightLabel: "CPA",
+      leftFormatter: (val) => Math.round(val),
+      rightFormatter: (val) => Math.round(val) + "₽"
+    };
+  }
+
   function drawChart() {
     const canvas = document.getElementById("chart");
     const ctx = canvas.getContext("2d");
@@ -335,11 +373,12 @@ function setDelta(el, pct) {
     const plotW = w - pad.l - pad.r;
     const plotH = h - pad.t - pad.b;
 
-    const points = state.chartChannel === "all" ? demo.daily : getChannelDaily(state.chartChannel);
-    const spend = points.map((p) => p.spend);
-    const clicks = points.map((p) => p.clicks);
-    const maxSpend = Math.max(...spend) * 1.08;
-    const maxClicks = Math.max(...clicks) * 1.12;
+    const chart = getChartSeries();
+    const points = chart.points;
+    const leftSeries = chart.left;
+    const rightSeries = chart.right;
+    const maxLeft = Math.max(...leftSeries) * 1.08;
+    const maxRight = Math.max(...rightSeries) * 1.12;
 
     // bg
     ctx.clearRect(0, 0, w, h);
@@ -367,16 +406,16 @@ function setDelta(el, pct) {
     // left axis (spend, k)
     for (let i = 0; i <= gridY; i++) {
       const y = pad.t + (plotH * i) / gridY;
-      const val = maxSpend - (maxSpend * i) / gridY;
-      ctx.fillText(Math.round(val / 1000) + "k", 10, y);
+      const val = maxLeft - (maxLeft * i) / gridY;
+      ctx.fillText(chart.leftFormatter(val), 10, y);
     }
 
     // right axis (clicks)
     ctx.textAlign = "right";
     for (let i = 0; i <= gridY; i++) {
       const y = pad.t + (plotH * i) / gridY;
-      const val = maxClicks - (maxClicks * i) / gridY;
-      ctx.fillText(Math.round(val), w - 10, y);
+      const val = maxRight - (maxRight * i) / gridY;
+      ctx.fillText(chart.rightFormatter(val), w - 10, y);
     }
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
@@ -388,15 +427,15 @@ function setDelta(el, pct) {
     }
 
     const xAt = (i) => pad.l + (plotW * i) / (points.length - 1);
-    const ySpend = (v) => pad.t + plotH - (plotH * v) / maxSpend;
-    const yClicks = (v) => pad.t + plotH - (plotH * v) / maxClicks;
+    const yLeft = (v) => pad.t + plotH - (plotH * v) / maxLeft;
+    const yRight = (v) => pad.t + plotH - (plotH * v) / maxRight;
 
     // spend bars
     const barW = (plotW / points.length) * 0.55;
     ctx.fillStyle = "rgba(109,94,252,0.35)";
     for (let i = 0; i < points.length; i++) {
       const x = xAt(i) - barW / 2;
-      const y = ySpend(points[i].spend);
+      const y = yLeft(leftSeries[i]);
       const bh = pad.t + plotH - y;
       ctx.fillRect(x, y, barW, bh);
     }
@@ -407,7 +446,7 @@ function setDelta(el, pct) {
     ctx.beginPath();
     for (let i = 0; i < points.length; i++) {
       const x = xAt(i);
-      const y = yClicks(points[i].clicks);
+      const y = yRight(rightSeries[i]);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
@@ -417,7 +456,7 @@ function setDelta(el, pct) {
     ctx.fillStyle = "rgba(34,197,94,1)";
     for (let i = 0; i < points.length; i++) {
       const x = xAt(i);
-      const y = yClicks(points[i].clicks);
+      const y = yRight(rightSeries[i]);
       ctx.beginPath();
       ctx.arc(x, y, 3, 0, Math.PI * 2);
       ctx.fill();
@@ -430,9 +469,9 @@ function setDelta(el, pct) {
       ? "все каналы"
       : state.chartChannel === "search" ? "поиск" : "РСЯ";
 
-    ctx.fillText(`▮ Расход (${channelLabel})`, pad.l, 16);
+    ctx.fillText(`▮ ${chart.leftLabel} (${channelLabel})`, pad.l, 16);
     ctx.fillStyle = "rgba(34,197,94,0.95)";
-    ctx.fillText("— Клики (правая шкала)", pad.l + 180, 16);
+    ctx.fillText(`— ${chart.rightLabel} (правая шкала)`, pad.l + 210, 16);
   }
 
   // --- Campaign calculations ---
@@ -579,11 +618,14 @@ function setDelta(el, pct) {
 
       // name
       const tdName = document.createElement("td");
+      tdName.className = "campaignNameCell";
+      tdName.dataset.label = "Кампания";
       tdName.textContent = r.name;
       tr.appendChild(tdName);
 
       // status
       const tdStatus = document.createElement("td");
+      tdStatus.dataset.label = "Статус";
       const tag = document.createElement("span");
       tag.className = "tag " + r.status.cls;
       tag.textContent = r.status.text;
@@ -592,6 +634,7 @@ function setDelta(el, pct) {
 
       // spend with microbar
       const tdSpend = document.createElement("td");
+      tdSpend.dataset.label = "Расход";
       tdSpend.className = "mono spendCell";
       tdSpend.textContent = formatMoney(r.spend, 2);
       tdSpend.appendChild(createTrendElement(trend.spend ?? 0, true));
@@ -607,6 +650,7 @@ function setDelta(el, pct) {
 
       // ctr (highlight)
       const tdCtr = document.createElement("td");
+      tdCtr.dataset.label = "CTR";
       tdCtr.className = "mono " + cellClass(r.ctr, "ctr");
       tdCtr.textContent = formatPct(r.ctr, 2);
       tdCtr.appendChild(createTrendElement(trend.ctr ?? 0));
@@ -614,6 +658,7 @@ function setDelta(el, pct) {
 
       // clicks
       const tdClicks = document.createElement("td");
+      tdClicks.dataset.label = "Клики";
       tdClicks.className = "mono";
       tdClicks.textContent = formatInt(r.clicks);
       tdClicks.appendChild(createTrendElement(trend.clicks ?? 0));
@@ -621,6 +666,7 @@ function setDelta(el, pct) {
 
       // cpc (highlight)
       const tdCpc = document.createElement("td");
+      tdCpc.dataset.label = "CPC";
       tdCpc.className = "mono " + cellClass(r.cpc, "cpc");
       tdCpc.textContent = formatMoney(r.cpc, 2);
       tdCpc.appendChild(createTrendElement(trend.cpc ?? 0, true));
@@ -628,6 +674,7 @@ function setDelta(el, pct) {
 
       // conv
       const tdConv = document.createElement("td");
+      tdConv.dataset.label = "Конверсии";
       tdConv.className = "mono";
       tdConv.textContent = formatInt(r.conv);
       tdConv.appendChild(createTrendElement(trend.conv ?? 0));
@@ -635,6 +682,7 @@ function setDelta(el, pct) {
 
       // cr (highlight)
       const tdCr = document.createElement("td");
+      tdCr.dataset.label = "CR";
       tdCr.className = "mono " + cellClass(r.cr, "cr");
       tdCr.textContent = formatPct(r.cr, 2);
       tdCr.appendChild(createTrendElement(trend.cr ?? 0));
@@ -642,6 +690,7 @@ function setDelta(el, pct) {
 
       // cpa (highlight)
       const tdCpa = document.createElement("td");
+      tdCpa.dataset.label = "CPA";
       tdCpa.className = "mono " + cellClass(r.cpa, "cpa");
       tdCpa.textContent = formatMoney(r.cpa, 2);
       tdCpa.appendChild(createTrendElement(trend.cpa ?? 0, true));
@@ -768,6 +817,15 @@ function setDelta(el, pct) {
       chartChannel.value = state.chartChannel;
       chartChannel.addEventListener("change", () => {
         state.chartChannel = chartChannel.value;
+        drawChart();
+      });
+    }
+
+    const chartMode = document.getElementById("chartMode");
+    if (chartMode) {
+      chartMode.value = state.chartMode;
+      chartMode.addEventListener("change", () => {
+        state.chartMode = chartMode.value;
         drawChart();
       });
     }

@@ -47,6 +47,7 @@
             <div class="balanceTopBadge">
               <span class="balanceTopLabel">Остаток баланса</span>
               <span class="mono" id="kpiBalance">—</span>
+              <span class="balanceDays">Хватит на ~5 дней</span>
             </div>
           </div>
           <p>Сводный контроль расходов, трафика и эффективности по аккаунту. Демо-данные за последние 14 дней.</p>
@@ -165,6 +166,7 @@
       </section>
 
       <section class="channelSection" aria-label="Детализация по каналам">
+        <h3 class="channelSectionTitle">Показатели на поиске и в РСЯ</h3>
         <div class="channelSwitch" role="group" aria-label="Переключение показателей Поиск/РСЯ">
           <button class="channelBtn" data-channel="search" type="button" aria-expanded="false">
             Поиск
@@ -185,6 +187,13 @@
               <div class="hint">по дням (демо), с двумя шкалами</div>
             </div>
             <div class="chartHeaderControls">
+              <div class="control small">
+                <label for="chartMode">Режим</label>
+                <select id="chartMode">
+                  <option value="traffic">Трафик</option>
+                  <option value="conversions">Конверсии</option>
+                </select>
+              </div>
               <div class="control small">
                 <label for="chartChannel">Канал</label>
                 <select id="chartChannel">

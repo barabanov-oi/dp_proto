@@ -436,3 +436,19 @@ canvas{ width:100%; height:260px; display:block; }
 .delta.warn{ border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.10); }
 .delta.bad{ border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.10); }
 
+
+.balanceDays{
+  display:block;
+  font-size:11px;
+  color: rgba(255,255,255,.82);
+}
+.channelSectionTitle{
+  margin:0;
+  font-size:16px;
+  font-weight:700;
+  color: rgba(255,255,255,.9);
+}
+.kpiCard.kpiCritical{
+  border-color: rgba(239,68,68,.5);
+  background: linear-gradient(180deg, rgba(239,68,68,.24), rgba(239,68,68,.08));
+}
