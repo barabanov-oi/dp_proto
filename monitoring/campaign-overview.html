@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DirectPulse — Обзор кампании</title>
+  <link rel="stylesheet" href="./campaign-overview.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>DirectPulse <span class="sub">Мониторинг Яндекс Директа</span></h1>
+        </div>
+      </div>
+
+      <div class="menuTitle">Мониторы</div>
+      <nav class="nav" aria-label="Главное меню">
+        <a href="./index.html"><span class="dot"></span>Сводка</a>
+        <a href="#" class="active"><span class="dot"></span>Мониторинг</a>
+        <a href="#"><span class="dot"></span>Статистика</a>
+        <a href="#"><span class="dot"></span>Аудит</a>
+        <a href="#"><span class="dot"></span>Wordstat</a>
+        <a href="#"><span class="dot"></span>Конкуренты</a>
+        <a href="#"><span class="dot"></span>Анализ рынка</a>
+        <a href="#"><span class="dot"></span>Anti-Fraud</a>
+        <a href="#"><span class="dot"></span>Уведомления</a>
+      </nav>
+
+      <div class="sidebarFooter">
+        <div><b>Демо-режим</b></div>
+        <div class="muted" style="margin-top:6px;">
+          Данные примерные. Подключите аккаунт, чтобы получать реальные метрики по API.
+        </div>
+        <div class="pill"><span class="k"></span><span>Статус: OK</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="titleWrap">
+          <h2 id="campaignTitle">Обзор кампании</h2>
+          <p>Ключевые показатели, динамика и детализация по срезам. Период: последние 7 дней.</p>
+        </div>
+        <span class="tag" id="lastUpdate">Обновлено: —</span>
+      </header>
+
+      <section class="kpiGrid" id="kpiGrid" aria-label="Ключевые показатели"></section>
+
+      <section class="overviewGrid">
+        <article class="card span-8">
+          <div class="cardHeader">
+            <div>
+              <h3>Динамика расходов и кликов за 7 дней</h3>
+              <div class="hint">Левая шкала — расход, правая — клики</div>
+            </div>
+          </div>
+          <div class="chartWrap">
+            <canvas id="trendChart" width="1200" height="340" aria-label="График динамики расходов и кликов"></canvas>
+          </div>
+        </article>
+
+        <article class="card span-4 piePanel">
+          <div class="cardHeader">
+            <div>
+              <h3>Распределение по срезам</h3>
+              <div class="hint">Расходы и клики по устройствам и полу</div>
+            </div>
+          </div>
+
+          <div class="piesWrap">
+            <div class="pieCard">
+              <h4>Расходы по устройствам</h4>
+              <canvas id="deviceSpendChart" width="300" height="300"></canvas>
+            </div>
+            <div class="pieCard">
+              <h4>Клики по устройствам</h4>
+              <canvas id="deviceClicksChart" width="300" height="300"></canvas>
+            </div>
+            <div class="pieCard">
+              <h4>Расходы по полу</h4>
+              <canvas id="genderSpendChart" width="300" height="300"></canvas>
+            </div>
+            <div class="pieCard">
+              <h4>Клики по полу</h4>
+              <canvas id="genderClicksChart" width="300" height="300"></canvas>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="grid sectionTop" id="sliceTables"></section>
+      <section class="grid sectionTop" id="groupsSection"></section>
+      <section class="grid sectionTop" id="networksSection"></section>
+    </main>
+  </div>
+
+  <script src="./campaign-overview.js"></script>
+</body>
+</html>
