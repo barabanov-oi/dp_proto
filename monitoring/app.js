@@ -119,9 +119,54 @@ function setDelta(el, pct) {
     sortBy: "severity",
     selectedChannelKpi: null,
     chartChannel: "all",
-    chartMode: "traffic"
+    chartMode: "traffic",
+    theme: "light"
   };
 
+
+
+
+  function chartPalette() {
+    const rootStyle = getComputedStyle(document.documentElement);
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    return {
+      bg: isDark ? "rgba(255,255,255,0.02)" : "rgba(24,36,61,0.03)",
+      grid: isDark ? "rgba(255,255,255,0.06)" : "rgba(99,113,138,0.22)",
+      axis: isDark ? "rgba(255,255,255,0.60)" : "rgba(24,36,61,0.65)",
+      legend: isDark ? "rgba(255,255,255,0.75)" : "rgba(24,36,61,0.80)",
+      bars: isDark ? "rgba(109,94,252,0.35)" : "rgba(79,70,229,0.38)",
+      line: rootStyle.getPropertyValue("--good").trim() || "#22c55e"
+    };
+  }
+
+  function applyTheme(theme) {
+    const normalized = theme === "dark" ? "dark" : "light";
+    state.theme = normalized;
+    document.documentElement.setAttribute("data-theme", normalized);
+    localStorage.setItem("monitoring-theme", normalized);
+
+    const btn = document.getElementById("themeToggle");
+    if (btn) {
+      const dark = normalized === "dark";
+      btn.setAttribute("aria-pressed", dark ? "true" : "false");
+      btn.textContent = dark ? "☀️ Светлая тема" : "🌙 Тёмная тема";
+    }
+
+    drawChart();
+  }
+
+  function bindThemeToggle() {
+    const btn = document.getElementById("themeToggle");
+    if (!btn) return;
+
+    const saved = localStorage.getItem("monitoring-theme");
+    const systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    applyTheme(saved || (systemDark ? "dark" : "light"));
+
+    btn.addEventListener("click", () => {
+      applyTheme(state.theme === "dark" ? "light" : "dark");
+    });
+  }
 
   // --- KPI render (8 показателей) ---
   function renderKPI() {
@@ -380,13 +425,15 @@ function setDelta(el, pct) {
     const maxLeft = Math.max(...leftSeries) * 1.08;
     const maxRight = Math.max(...rightSeries) * 1.12;
 
+    const palette = chartPalette();
+
     // bg
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "rgba(255,255,255,0.02)";
+    ctx.fillStyle = palette.bg;
     ctx.fillRect(0, 0, w, h);
 
     // grid
-    ctx.strokeStyle = "rgba(255,255,255,0.06)";
+    ctx.strokeStyle = palette.grid;
     ctx.lineWidth = 1;
     const gridY = 5;
     for (let i = 0; i <= gridY; i++) {
@@ -398,7 +445,7 @@ function setDelta(el, pct) {
     }
 
     // axes labels
-    ctx.fillStyle = "rgba(255,255,255,0.60)";
+    ctx.fillStyle = palette.axis;
     ctx.font = "12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial";
     ctx.textBaseline = "middle";
     ctx.textAlign = "left";
@@ -432,7 +479,7 @@ function setDelta(el, pct) {
 
     // spend bars
     const barW = (plotW / points.length) * 0.55;
-    ctx.fillStyle = "rgba(109,94,252,0.35)";
+    ctx.fillStyle = palette.bars;
     for (let i = 0; i < points.length; i++) {
       const x = xAt(i) - barW / 2;
       const y = yLeft(leftSeries[i]);
@@ -441,7 +488,7 @@ function setDelta(el, pct) {
     }
 
     // clicks line
-    ctx.strokeStyle = "rgba(34,197,94,0.95)";
+    ctx.strokeStyle = palette.line;
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (let i = 0; i < points.length; i++) {
@@ -453,7 +500,7 @@ function setDelta(el, pct) {
     ctx.stroke();
 
     // points
-    ctx.fillStyle = "rgba(34,197,94,1)";
+    ctx.fillStyle = palette.line;
     for (let i = 0; i < points.length; i++) {
       const x = xAt(i);
       const y = yRight(rightSeries[i]);
@@ -463,14 +510,14 @@ function setDelta(el, pct) {
     }
 
     // legend
-    ctx.fillStyle = "rgba(255,255,255,0.75)";
+    ctx.fillStyle = palette.legend;
     ctx.font = "12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial";
     const channelLabel = state.chartChannel === "all"
       ? "все каналы"
       : state.chartChannel === "search" ? "поиск" : "РСЯ";
 
     ctx.fillText(`▮ ${chart.leftLabel} (${channelLabel})`, pad.l, 16);
-    ctx.fillStyle = "rgba(34,197,94,0.95)";
+    ctx.fillStyle = palette.line;
     ctx.fillText(`— ${chart.rightLabel} (правая шкала)`, pad.l + 210, 16);
   }
 
@@ -845,6 +892,7 @@ function setDelta(el, pct) {
 
 function initApp() {
   window.addEventListener("resize", drawChart);
+  bindThemeToggle();
   document.getElementById("refreshBtn").addEventListener("click", () => {
     renderKPI();
     renderAlerts();
