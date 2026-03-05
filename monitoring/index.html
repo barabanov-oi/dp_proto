@@ -31,7 +31,7 @@
       </nav>
 
       <div class="sidebarFooter">
-        <div><b>Демо-режим</b></div>
+        <div><b>Статус панели</b></div>
         <div class="muted" style="margin-top:6px;">
           Данные примерные. Подключите аккаунт, чтобы получать реальные метрики по API.
         </div>
@@ -41,6 +41,7 @@
 
     <main class="main">
       <div class="topbar">
+        <button class="btn btnTheme" id="themeToggle" type="button" aria-pressed="false">🌙 Тёмная тема</button>
         <div class="titleWrap">
           <div class="titleHead">
             <h2>Мониторинг базовых показателей</h2>
@@ -73,9 +74,8 @@
             </select>
           </div>
 
-          <button class="btn" id="refreshBtn" type="button">Обновить</button>
-          <button class="btn btnTheme" id="themeToggle" type="button" aria-pressed="false">🌙 Тёмная тема</button>
         </div>
+        <button class="btn btnRefresh" id="refreshBtn" type="button">🔄 Обновить</button>
       </div>
 
       <!-- KPI: 8 плиток, 4 в ряд -->
@@ -182,16 +182,25 @@
       </div>
 
       <section class="channelSection" aria-label="Детализация по каналам">
-        <h3 class="channelSectionTitle">Показатели на поиске и в РСЯ</h3>
-        <div class="channelSwitch" role="group" aria-label="Переключение показателей Поиск/РСЯ">
-          <button class="channelBtn" data-channel="search" type="button" aria-expanded="false">
-            Поиск
-          </button>
-          <button class="channelBtn" data-channel="rsya" type="button" aria-expanded="false">
-            РСЯ
-          </button>
+        <h3 class="channelSectionTitle">Поиск и сети</h3>
+        <div class="tableWrap" aria-label="Сводка по каналам">
+          <table class="campaignsTable channelTable">
+            <thead>
+              <tr>
+                <th>Канал</th>
+                <th class="mono">Расход, ₽</th>
+                <th class="mono">Показы</th>
+                <th class="mono">Клики</th>
+                <th class="mono">CTR</th>
+                <th class="mono">CPC, ₽</th>
+                <th class="mono">Конверсии</th>
+                <th class="mono">CR</th>
+                <th class="mono">CPA, ₽</th>
+              </tr>
+            </thead>
+            <tbody id="channelSummaryBody"></tbody>
+          </table>
         </div>
-        <div class="kpiGrid kpiGridInner hidden" id="channelKpiGrid"></div>
       </section>
 
       <section class="grid">
@@ -218,7 +227,6 @@
                   <option value="rsya">РСЯ</option>
                 </select>
               </div>
-              <div class="tag" id="lastUpdateTag">Обновлено: —</div>
             </div>
           </div>
           <div class="chartWrap">

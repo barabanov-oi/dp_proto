@@ -7,8 +7,7 @@
     ns.renderAlerts();
     ns.drawChart();
     ns.renderCampaigns();
-    ns.renderChannelSwitch();
-    ns.renderChannelButtons();
+    ns.renderChannelSummary();
   }
 
   function bindGlobalHandlers() {

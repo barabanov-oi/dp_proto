@@ -14,65 +14,42 @@
     document.getElementById("alertsCount").textContent = `${ns.demo.alerts.length} сигнала`;
   };
 
-  ns.renderChannelKpi = function renderChannelKpi(channel) {
-    const container = document.getElementById("channelKpiGrid");
-    if (!container) return;
-    const totals = ns.aggregateByName(channel === "search" ? "Поиск" : "РСЯ");
-    const delta = ns.demo.channelDeltas[channel];
+  ns.renderChannelSummary = function renderChannelSummary() {
+    const tbody = document.getElementById("channelSummaryBody");
+    if (!tbody) return;
 
-    const ctr = totals.impressions ? (totals.clicks / totals.impressions) * 100 : 0;
-    const cpc = totals.clicks ? totals.spend / totals.clicks : 0;
-    const cr = totals.clicks ? (totals.conversions / totals.clicks) * 100 : 0;
-    const cpa = totals.conversions ? totals.spend / totals.conversions : 0;
-
-    const cards = [
-      ["Расход", ns.formatMoney(totals.spend, 0), delta.spend], ["CTR", ns.formatPct(ctr, 2), delta.ctr],
-      ["CR", ns.formatPct(cr, 2), delta.cr], ["CPA", ns.formatMoney(cpa, 2), delta.cpa],
-      ["Клики", ns.formatInt(totals.clicks), delta.clicks], ["Показы", ns.formatInt(totals.impressions), delta.impressions],
-      ["Конверсии", ns.formatInt(totals.conversions), delta.conversions], ["CPC", ns.formatMoney(cpc, 2), delta.cpc]
+    const channels = [
+      { key: "search", label: "Поиск" },
+      { key: "rsya", label: "РСЯ" }
     ];
 
-    container.innerHTML = cards.map(([label, value, d]) => `<div class="kpiCard"><div class="kpiTop"><div><div class="kpiLabel">${label}</div></div><span class="delta" data-delta="${d}"></span></div><div class="kpiValue mono">${value}</div></div>`).join("");
-    container.querySelectorAll("[data-delta]").forEach((el) => ns.setDelta(el, Number(el.dataset.delta)));
-  };
+    tbody.innerHTML = channels.map(({ key, label }) => {
+      const totals = ns.aggregateByName(label);
+      const ctr = totals.impressions ? (totals.clicks / totals.impressions) * 100 : 0;
+      const cpc = totals.clicks ? totals.spend / totals.clicks : 0;
+      const cr = totals.clicks ? (totals.conversions / totals.clicks) * 100 : 0;
+      const cpa = totals.conversions ? totals.spend / totals.conversions : 0;
+      const delta = ns.demo.channelDeltas[key] || {};
 
-  ns.renderChannelButtons = function renderChannelButtons() {
-    document.querySelectorAll(".channelBtn").forEach((btn) => {
-      const channel = btn.dataset.channel || "search";
-      const totals = ns.aggregateByName(channel === "search" ? "Поиск" : "РСЯ");
-      const delta = ns.demo.channelDeltas[channel] || {};
-      btn.innerHTML = `<span class="channelBtnTitle">${channel === "search" ? "Поиск" : "РСЯ"}</span><span class="channelBtnMeta"><span>Расход ${ns.formatMoney(totals.spend, 0)} ${delta.spend >= 0 ? "▲" : "▼"} ${Math.abs(delta.spend ?? 0).toFixed(1)}%</span><span>Клики ${ns.formatInt(totals.clicks)} ${delta.clicks >= 0 ? "▲" : "▼"} ${Math.abs(delta.clicks ?? 0).toFixed(1)}%</span><span>Конверсии ${ns.formatInt(totals.conversions)} ${delta.conversions >= 0 ? "▲" : "▼"} ${Math.abs(delta.conversions ?? 0).toFixed(1)}%</span></span>`;
-    });
-  };
+      return `
+        <tr>
+          <td>${label}</td>
+          <td class="mono">${ns.formatMoney(totals.spend, 0)} <span class="trendInline" data-delta="${delta.spend ?? 0}"></span></td>
+          <td class="mono">${ns.formatInt(totals.impressions)}</td>
+          <td class="mono">${ns.formatInt(totals.clicks)} <span class="trendInline" data-delta="${delta.clicks ?? 0}"></span></td>
+          <td class="mono">${ns.formatPct(ctr, 2)} <span class="trendInline" data-delta="${delta.ctr ?? 0}"></span></td>
+          <td class="mono">${ns.formatMoney(cpc, 2)} <span class="trendInline" data-delta="${delta.cpc ?? 0}"></span></td>
+          <td class="mono">${ns.formatInt(totals.conversions)} <span class="trendInline" data-delta="${delta.conversions ?? 0}"></span></td>
+          <td class="mono">${ns.formatPct(cr, 2)} <span class="trendInline" data-delta="${delta.cr ?? 0}"></span></td>
+          <td class="mono">${ns.formatMoney(cpa, 2)} <span class="trendInline" data-delta="${delta.cpa ?? 0}"></span></td>
+        </tr>
+      `;
+    }).join("");
 
-  ns.renderChannelSwitch = function renderChannelSwitch() {
-    const grid = document.getElementById("channelKpiGrid");
-    document.querySelectorAll(".channelBtn").forEach((btn) => {
-      const isActive = btn.dataset.channel === ns.state.selectedChannelKpi;
-      btn.classList.toggle("active", isActive);
-      btn.setAttribute("aria-expanded", isActive ? "true" : "false");
-    });
-
-    if (!grid) return;
-    if (!ns.state.selectedChannelKpi) {
-      grid.classList.add("hidden");
-      grid.innerHTML = "";
-      return;
-    }
-
-    grid.classList.remove("hidden");
-    ns.renderChannelKpi(ns.state.selectedChannelKpi);
+    tbody.querySelectorAll(".trendInline").forEach((el) => ns.setDelta(el, Number(el.dataset.delta)));
   };
 
   ns.bindChannelControls = function bindChannelControls() {
-    document.querySelectorAll(".channelBtn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const channel = btn.dataset.channel || "search";
-        ns.state.selectedChannelKpi = ns.state.selectedChannelKpi === channel ? null : channel;
-        ns.renderChannelSwitch();
-      });
-    });
-
     const chartChannel = document.getElementById("chartChannel");
     if (chartChannel) {
       chartChannel.value = ns.state.chartChannel;

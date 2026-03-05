@@ -78,7 +78,6 @@
       card.classList.toggle("kpiCritical", Boolean(delta && delta.classList.contains("bad")));
     });
 
-    document.getElementById("lastUpdateTag").textContent = `Обновлено: ${new Date().toLocaleString("ru-RU")}`;
   };
 
   function renderSparkline(svgId, metric) {
