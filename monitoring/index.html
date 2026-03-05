@@ -44,11 +44,11 @@
         <div class="titleWrap">
           <div class="titleHead">
             <h2>Мониторинг базовых показателей</h2>
-            <div class="balanceTopBadge">
-              <span class="balanceTopLabel">Остаток баланса</span>
-              <span class="mono" id="kpiBalance">—</span>
-              <span class="balanceDays">Хватит на ~5 дней</span>
-            </div>
+          </div>
+          <div class="balanceTopBadge">
+            <span class="balanceTopLabel">Остаток баланса</span>
+            <span class="mono" id="kpiBalance">—</span>
+            <span class="balanceDays">Хватит на ~5 дней</span>
           </div>
           <p>Сводный контроль расходов, трафика и эффективности по аккаунту. Демо-данные за последние 14 дней.</p>
         </div>
@@ -64,10 +64,13 @@
           </div>
 
           <div class="control">
-            <label for="from">Период</label>
-            <input id="from" type="date" />
-            <span class="sep">—</span>
-            <input id="to" type="date" />
+            <label for="periodPreset">Период</label>
+            <select id="periodPreset">
+              <option value="1">Вчера</option>
+              <option value="7">7 дней</option>
+              <option value="14" selected>14 дней</option>
+              <option value="28">28 дней</option>
+            </select>
           </div>
 
           <button class="btn" id="refreshBtn" type="button">Обновить</button>
@@ -77,94 +80,106 @@
 
       <!-- KPI: 8 плиток, 4 в ряд -->
       <section class="kpiGrid" aria-label="Показатели">
-        <div class="kpiCard">
+        <div class="kpiCard" data-metric="spend" role="button" tabindex="0">
           <div class="kpiTop">
             <div>
               <div class="kpiLabel">Расход</div>
-              <div class="kpiHint">за период</div>
             </div>
             <span class="delta warn" id="deltaSpend">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiSpend">—</div>
+          <svg class="kpiSparkline" id="sparkSpend" viewBox="0 0 120 32" aria-hidden="true"></svg>
         </div>
 
-        <div class="kpiCard">
+        <div class="kpiCard" data-metric="impressions" role="button" tabindex="0">
           <div class="kpiTop">
             <div>
               <div class="kpiLabel">Показы</div>
-              <div class="kpiHint">за период</div>
             </div>
             <span class="delta good" id="deltaImpr">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiImpr">—</div>
+          <svg class="kpiSparkline" id="sparkImpressions" viewBox="0 0 120 32" aria-hidden="true"></svg>
         </div>
 
-        <div class="kpiCard">
+        <div class="kpiCard" data-metric="ctr" role="button" tabindex="0">
           <div class="kpiTop">
             <div>
               <div class="kpiLabel">CTR</div>
-              <div class="kpiHint">средний</div>
             </div>
             <span class="delta good" id="deltaCtr">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiCtr">—</div>
+          <svg class="kpiSparkline" id="sparkCtr" viewBox="0 0 120 32" aria-hidden="true"></svg>
         </div>
 
-        <div class="kpiCard">
+        <div class="kpiCard" data-metric="clicks" role="button" tabindex="0">
           <div class="kpiTop">
             <div>
               <div class="kpiLabel">Клики</div>
-              <div class="kpiHint">за период</div>
             </div>
             <span class="delta good" id="deltaClicks">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiClicks">—</div>
+          <svg class="kpiSparkline" id="sparkClicks" viewBox="0 0 120 32" aria-hidden="true"></svg>
         </div>
 
-        <div class="kpiCard">
+        <div class="kpiCard" data-metric="cpc" role="button" tabindex="0">
           <div class="kpiTop">
             <div>
               <div class="kpiLabel">CPC</div>
-              <div class="kpiHint">средний</div>
             </div>
             <span class="delta warn" id="deltaCpc">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiCpc">—</div>
+          <svg class="kpiSparkline" id="sparkCpc" viewBox="0 0 120 32" aria-hidden="true"></svg>
         </div>
 
-        <div class="kpiCard">
+        <div class="kpiCard" data-metric="conversions" role="button" tabindex="0">
           <div class="kpiTop">
             <div>
               <div class="kpiLabel">Конверсии</div>
-              <div class="kpiHint">за период</div>
             </div>
             <span class="delta good" id="deltaConv">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiConv">—</div>
+          <svg class="kpiSparkline" id="sparkConversions" viewBox="0 0 120 32" aria-hidden="true"></svg>
         </div>
 
-        <div class="kpiCard">
+        <div class="kpiCard" data-metric="cr" role="button" tabindex="0">
           <div class="kpiTop">
             <div>
               <div class="kpiLabel">CR</div>
-              <div class="kpiHint">средний</div>
             </div>
             <span class="delta bad" id="deltaCr">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiCr">—</div>
+          <svg class="kpiSparkline" id="sparkCr" viewBox="0 0 120 32" aria-hidden="true"></svg>
         </div>
 
-        <div class="kpiCard">
+        <div class="kpiCard" data-metric="cpa" role="button" tabindex="0">
           <div class="kpiTop">
             <div>
               <div class="kpiLabel">CPA</div>
-              <div class="kpiHint">средний</div>
             </div>
             <span class="delta bad" id="deltaCpa">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiCpa">—</div>
+          <svg class="kpiSparkline" id="sparkCpa" viewBox="0 0 120 32" aria-hidden="true"></svg>
         </div>
       </section>
+
+      <div class="kpiModal" id="kpiModal" aria-hidden="true">
+        <div class="kpiModalDialog" role="dialog" aria-modal="true" aria-labelledby="kpiModalTitle">
+          <div class="kpiModalHeader">
+            <h3 id="kpiModalTitle">Динамика показателя</h3>
+            <button class="btn btnTiny" id="kpiModalClose" type="button">Закрыть</button>
+          </div>
+          <div class="chartWrap">
+            <canvas id="kpiDetailChart" width="1200" height="320" aria-label="График показателя за 2 недели"></canvas>
+          </div>
+        </div>
+      </div>
 
       <section class="channelSection" aria-label="Детализация по каналам">
         <h3 class="channelSectionTitle">Показатели на поиске и в РСЯ</h3>
