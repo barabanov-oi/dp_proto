@@ -1,5 +1,7 @@
-import { formatInt, formatMoney, formatPct, setDelta } from "./formatters.js";
-import { demo, state, getVisibleDailyData, getDailyMetric, chartPalette, aggregateByName, getChannelDaily, formatDateLabel } from "./monitoring-data.js";
+(function () {
+const { formatInt, formatMoney, formatPct, setDelta } = window.MonitoringFormatters;
+const { demo, state, getVisibleDailyData, getDailyMetric, chartPalette, aggregateByName, getChannelDaily, formatDateLabel } = window.MonitoringData;
+
 
   function applyTheme(theme) {
     const normalized = theme === "dark" ? "dark" : "light";
@@ -870,7 +872,7 @@ import { demo, state, getVisibleDailyData, getDailyMetric, chartPalette, aggrega
     bindKpiCards();
   }
 
-export function initApp() {
+function initApp() {
   window.addEventListener("resize", () => {
     drawChart();
     if (document.getElementById("kpiModal")?.classList.contains("open")) {
@@ -891,3 +893,5 @@ export function initApp() {
   init();
   renderChannelButtons();
 }
+window.MonitoringApp = { initApp };
+})();

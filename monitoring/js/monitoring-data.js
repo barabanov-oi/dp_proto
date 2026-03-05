@@ -1,4 +1,5 @@
-export const demo = {
+(function () {
+const demo = {
   periodDays: 14,
   totals: {
     balance: 483920.45,
@@ -73,7 +74,7 @@ export const demo = {
   }
 };
 
-export const state = {
+const state = {
   filter: "all",
   sortBy: "severity",
   selectedChannelKpi: null,
@@ -106,11 +107,11 @@ function generateExtendedDaily(days = 28) {
 
 const extendedDaily = generateExtendedDaily(28);
 
-export function getVisibleDailyData() {
+function getVisibleDailyData() {
   return extendedDaily.slice(-state.periodDays);
 }
 
-export function getDailyMetric(metric, days = state.periodDays) {
+function getDailyMetric(metric, days = state.periodDays) {
   const points = extendedDaily.slice(-days);
   return points.map((point, index) => {
     const impressions = Math.max(point.clicks, Math.round(point.clicks * (49 + Math.sin(index / 2.6) * 4)));
@@ -125,7 +126,7 @@ export function getDailyMetric(metric, days = state.periodDays) {
   });
 }
 
-export function aggregateByName(part) {
+function aggregateByName(part) {
   const rows = demo.campaigns.filter((c) => c.name.includes(part));
   return rows.reduce((acc, c) => {
     acc.spend += c.spend;
@@ -136,7 +137,7 @@ export function aggregateByName(part) {
   }, { spend: 0, impressions: 0, clicks: 0, conversions: 0 });
 }
 
-export function getChannelDaily(channel) {
+function getChannelDaily(channel) {
   const ratioByDay = demo.daily.map((_, index) => {
     const wave = Math.sin(index / 2.4) * 0.06;
     return Math.min(0.74, Math.max(0.58, 0.65 + wave));
@@ -150,12 +151,12 @@ export function getChannelDaily(channel) {
   });
 }
 
-export function formatDateLabel(iso) {
+function formatDateLabel(iso) {
   const d = new Date(iso + "T00:00:00");
   return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
 }
 
-export function chartPalette() {
+function chartPalette() {
   const rootStyle = getComputedStyle(document.documentElement);
   const isDark = document.documentElement.getAttribute("data-theme") === "dark";
   return {
@@ -167,3 +168,6 @@ export function chartPalette() {
     line: rootStyle.getPropertyValue("--good").trim() || "#22c55e"
   };
 }
+
+window.MonitoringData = { demo, state, getVisibleDailyData, getDailyMetric, aggregateByName, getChannelDaily, formatDateLabel, chartPalette };
+})();

@@ -1,3 +1,5 @@
-import { initApp } from "./js/monitoring-main.js";
-
-initApp();
+(function () {
+  if (window.MonitoringApp?.initApp) {
+    window.MonitoringApp.initApp();
+  }
+})();
