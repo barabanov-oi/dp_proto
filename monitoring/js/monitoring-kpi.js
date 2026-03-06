@@ -31,7 +31,7 @@
 
     ns.drawChart();
     ns.renderSparklines();
-    if (document.getElementById("kpiModal")?.classList.contains("open")) {
+    if (document.getElementById("kpiModal")?.classList.contains("show")) {
       ns.drawKpiDetailChart(ns.state.activeKpiMetric);
     }
   };
@@ -79,9 +79,11 @@
     ns.setDelta(document.getElementById("deltaCr"), ns.demo.deltas.cr);
     ns.setDelta(document.getElementById("deltaCpa"), ns.demo.deltas.cpa);
 
-    document.querySelectorAll(".kpiCard").forEach((card) => {
+    document.querySelectorAll(".card[data-metric]").forEach((card) => {
       const delta = card.querySelector(".delta");
-      card.classList.toggle("kpiCritical", Boolean(delta && delta.classList.contains("bad")));
+      const critical = Boolean(delta && delta.classList.contains("bad"));
+      card.classList.toggle("border-danger", critical);
+      card.classList.toggle("border-2", critical);
     });
 
   };
@@ -186,16 +188,20 @@
     const title = document.getElementById("kpiModalTitle");
     if (!modal || !close || !title) return;
 
+    const modalInstance = window.bootstrap?.Modal ? bootstrap.Modal.getOrCreateInstance(modal) : null;
     const labels = { spend: "Расход", impressions: "Показы", ctr: "CTR", clicks: "Клики", cpc: "CPC", conversions: "Конверсии", cr: "CR", cpa: "CPA" };
     const openModal = (metric) => {
       ns.state.activeKpiMetric = metric;
       title.textContent = `Динамика: ${labels[metric] || "Показатель"} (14 дней)`;
-      modal.classList.add("open");
-      modal.setAttribute("aria-hidden", "false");
+      if (modalInstance) {
+        modalInstance.show();
+      } else {
+        modal.classList.add("show");
+      }
       ns.drawKpiDetailChart(metric);
     };
 
-    document.querySelectorAll(".kpiCard[data-metric]").forEach((card) => {
+    document.querySelectorAll(".card[data-metric]").forEach((card) => {
       const metric = card.dataset.metric || "spend";
       card.addEventListener("click", () => openModal(metric));
       card.addEventListener("keydown", (event) => {
@@ -206,12 +212,6 @@
       });
     });
 
-    const closeModal = () => {
-      modal.classList.remove("open");
-      modal.setAttribute("aria-hidden", "true");
-    };
-
-    close.addEventListener("click", closeModal);
-    modal.addEventListener("click", (event) => event.target === modal && closeModal());
+    close.addEventListener("click", () => modalInstance ? modalInstance.hide() : modal.classList.remove("show"));
   };
 })();

@@ -119,9 +119,9 @@
   };
 
   ns.bindCampaignControls = function bindCampaignControls() {
-    document.querySelectorAll(".segBtn").forEach((btn) => {
+    document.querySelectorAll(".btn-group [data-filter]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".segBtn").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".btn-group [data-filter]").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         ns.state.filter = btn.dataset.filter || "all";
         ns.renderCampaigns();

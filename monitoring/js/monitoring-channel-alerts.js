@@ -79,7 +79,7 @@
       ns.renderKPI();
       ns.renderSparklines();
       ns.drawChart();
-      if (document.getElementById("kpiModal")?.classList.contains("open")) ns.drawKpiDetailChart(ns.state.activeKpiMetric);
+      if (document.getElementById("kpiModal")?.classList.contains("show")) ns.drawKpiDetailChart(ns.state.activeKpiMetric);
     });
   };
 })();
