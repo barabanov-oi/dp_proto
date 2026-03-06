@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DirectPulse — Мониторинг (Bootstrap 5)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <div class="container-fluid app py-3">
+    <div class="row g-3">
+      <aside class="col-12 col-xl-3 sidebar">
+        <div class="d-flex flex-column h-100">
+          <div class="brand">
+            <div class="logo" aria-hidden="true"></div>
+            <div>
+              <h1>DirectPulse <span class="sub">Мониторинг Яндекс Директа</span></h1>
+            </div>
+          </div>
+
+          <div class="menuTitle">Мониторы</div>
+          <nav class="nav flex-column" aria-label="Главное меню">
+            <a href="#" class="active"><span class="dot"></span>Сводка</a>
+            <a href="#"><span class="dot"></span>Мониторинг</a>
+            <a href="#"><span class="dot"></span>Статистика</a>
+            <a href="#"><span class="dot"></span>Аудит</a>
+            <a href="#"><span class="dot"></span>Wordstat</a>
+            <a href="#"><span class="dot"></span>Конкуренты</a>
+            <a href="#"><span class="dot"></span>Анализ рынка</a>
+            <a href="#"><span class="dot"></span>Anti-Fraud</a>
+            <a href="#"><span class="dot"></span>Уведомления</a>
+          </nav>
+
+          <div class="sidebarFooter mt-auto">
+            <div><b>Статус панели</b></div>
+            <div class="muted mt-2">
+              Данные примерные. Подключите аккаунт, чтобы получать реальные метрики по API.
+            </div>
+            <div class="pill"><span class="k"></span><span>Статус: OK</span></div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="col-12 col-xl-9 main">
+        <div class="topbar">
+          <button class="btn btnTheme" id="themeToggle" type="button" aria-pressed="false">🌙 Тёмная тема</button>
+          <div class="titleWrap">
+            <div class="titleHead">
+              <h2>Мониторинг базовых показателей</h2>
+            </div>
+            <div class="balanceTopBadge">
+              <span class="balanceTopLabel">Остаток баланса</span>
+              <span class="mono" id="kpiBalance">—</span>
+              <span class="balanceDays">Хватит на ~5 дней</span>
+            </div>
+            <p>Сводный контроль расходов, трафика и эффективности по аккаунту. Демо-данные за последние 14 дней.</p>
+          </div>
+
+          <div class="controls d-flex gap-2 flex-wrap">
+            <div class="control">
+              <label for="account">Аккаунт</label>
+              <select id="account" class="form-select form-select-sm">
+                <option>vivion.la (demo)</option>
+                <option>client-2 (demo)</option>
+                <option>client-3 (demo)</option>
+              </select>
+            </div>
+
+            <div class="control">
+              <label for="periodPreset">Период</label>
+              <select id="periodPreset" class="form-select form-select-sm">
+                <option value="1">Вчера</option>
+                <option value="7">7 дней</option>
+                <option value="14" selected>14 дней</option>
+                <option value="28">28 дней</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btnRefresh" id="refreshBtn" type="button">🔄 Обновить</button>
+        </div>
+
+        <section class="kpiGrid" aria-label="Показатели">
+          <div class="kpiCard" data-metric="spend" role="button" tabindex="0">
+            <div class="kpiTop"><div><div class="kpiLabel">Расход</div></div><span class="delta warn" id="deltaSpend">▲ 0.0%</span></div>
+            <div class="kpiValue mono" id="kpiSpend">—</div>
+            <canvas class="kpiSparkline" id="sparkSpend" aria-hidden="true"></canvas>
+          </div>
+          <div class="kpiCard" data-metric="impressions" role="button" tabindex="0">
+            <div class="kpiTop"><div><div class="kpiLabel">Показы</div></div><span class="delta good" id="deltaImpr">▲ 0.0%</span></div>
+            <div class="kpiValue mono" id="kpiImpr">—</div>
+            <canvas class="kpiSparkline" id="sparkImpressions" aria-hidden="true"></canvas>
+          </div>
+          <div class="kpiCard" data-metric="ctr" role="button" tabindex="0">
+            <div class="kpiTop"><div><div class="kpiLabel">CTR</div></div><span class="delta good" id="deltaCtr">▲ 0.0%</span></div>
+            <div class="kpiValue mono" id="kpiCtr">—</div>
+            <canvas class="kpiSparkline" id="sparkCtr" aria-hidden="true"></canvas>
+          </div>
+          <div class="kpiCard" data-metric="clicks" role="button" tabindex="0">
+            <div class="kpiTop"><div><div class="kpiLabel">Клики</div></div><span class="delta good" id="deltaClicks">▲ 0.0%</span></div>
+            <div class="kpiValue mono" id="kpiClicks">—</div>
+            <canvas class="kpiSparkline" id="sparkClicks" aria-hidden="true"></canvas>
+          </div>
+          <div class="kpiCard" data-metric="cpc" role="button" tabindex="0">
+            <div class="kpiTop"><div><div class="kpiLabel">CPC</div></div><span class="delta warn" id="deltaCpc">▲ 0.0%</span></div>
+            <div class="kpiValue mono" id="kpiCpc">—</div>
+            <canvas class="kpiSparkline" id="sparkCpc" aria-hidden="true"></canvas>
+          </div>
+          <div class="kpiCard" data-metric="conversions" role="button" tabindex="0">
+            <div class="kpiTop"><div><div class="kpiLabel">Конверсии</div></div><span class="delta good" id="deltaConv">▲ 0.0%</span></div>
+            <div class="kpiValue mono" id="kpiConv">—</div>
+            <canvas class="kpiSparkline" id="sparkConversions" aria-hidden="true"></canvas>
+          </div>
+          <div class="kpiCard" data-metric="cr" role="button" tabindex="0">
+            <div class="kpiTop"><div><div class="kpiLabel">CR</div></div><span class="delta bad" id="deltaCr">▲ 0.0%</span></div>
+            <div class="kpiValue mono" id="kpiCr">—</div>
+            <canvas class="kpiSparkline" id="sparkCr" aria-hidden="true"></canvas>
+          </div>
+          <div class="kpiCard" data-metric="cpa" role="button" tabindex="0">
+            <div class="kpiTop"><div><div class="kpiLabel">CPA</div></div><span class="delta bad" id="deltaCpa">▲ 0.0%</span></div>
+            <div class="kpiValue mono" id="kpiCpa">—</div>
+            <canvas class="kpiSparkline" id="sparkCpa" aria-hidden="true"></canvas>
+          </div>
+        </section>
+
+        <div class="kpiModal" id="kpiModal" aria-hidden="true">
+          <div class="kpiModalDialog" role="dialog" aria-modal="true" aria-labelledby="kpiModalTitle">
+            <div class="kpiModalHeader">
+              <h3 id="kpiModalTitle">Динамика показателя</h3>
+              <button class="btn btnTiny" id="kpiModalClose" type="button">Закрыть</button>
+            </div>
+            <div class="chartWrap">
+              <canvas id="kpiDetailChart" width="1200" height="320" aria-label="График показателя за 2 недели"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <section class="channelSection" aria-label="Детализация по каналам">
+          <h3 class="channelSectionTitle">Поиск и сети</h3>
+          <div class="tableWrap" aria-label="Сводка по каналам">
+            <table class="campaignsTable channelTable table table-sm align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Канал</th><th class="mono">Расход, ₽</th><th class="mono">Показы</th><th class="mono">Клики</th><th class="mono">CTR</th><th class="mono">CPC, ₽</th><th class="mono">Конверсии</th><th class="mono">CR</th><th class="mono">CPA, ₽</th>
+                </tr>
+              </thead>
+              <tbody id="channelSummaryBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="grid">
+          <div class="card span-8">
+            <div class="cardHeader">
+              <div>
+                <h3>Динамика: расход и клики</h3>
+                <div class="hint">по дням (демо), с двумя шкалами</div>
+              </div>
+              <div class="chartHeaderControls d-flex gap-2 flex-wrap">
+                <div class="control small">
+                  <label for="chartMode">Режим</label>
+                  <select id="chartMode" class="form-select form-select-sm">
+                    <option value="traffic">Трафик</option>
+                    <option value="conversions">Конверсии</option>
+                  </select>
+                </div>
+                <div class="control small">
+                  <label for="chartChannel">Канал</label>
+                  <select id="chartChannel" class="form-select form-select-sm">
+                    <option value="all">Все</option>
+                    <option value="search">Поиск</option>
+                    <option value="rsya">РСЯ</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="chartWrap"><canvas id="chart" width="1200" height="320" aria-label="График расхода и кликов"></canvas></div>
+          </div>
+
+          <div class="card span-4">
+            <div class="cardHeader">
+              <div>
+                <h3>Сигналы мониторинга</h3>
+                <div class="hint">что требует внимания</div>
+              </div>
+              <span class="tag warn" id="alertsCount">3 сигнала</span>
+            </div>
+            <div class="cardBody"><ul class="statusList" id="alertsList"></ul></div>
+          </div>
+        </section>
+
+        <section class="grid mt-3">
+          <div class="card span-12">
+            <div class="cardHeader">
+              <div>
+                <h3>Кампании</h3>
+                <div class="hint">сводка по ключевым показателям, подсветка критичных + фильтр/сортировка</div>
+              </div>
+
+              <div class="tableControls d-flex gap-2 align-items-end flex-wrap">
+                <div class="segmented btn-group" role="group" aria-label="Фильтр кампаний">
+                  <button class="segBtn btn btn-sm btn-outline-secondary active" data-filter="all" type="button">Все</button>
+                  <button class="segBtn btn btn-sm btn-outline-secondary" data-filter="warn" type="button">Внимание</button>
+                  <button class="segBtn btn btn-sm btn-outline-secondary" data-filter="bad" type="button">Критично</button>
+                </div>
+
+                <div class="control small">
+                  <label for="sortBy">Сортировка</label>
+                  <select id="sortBy" class="form-select form-select-sm">
+                    <option value="severity">По критичности</option>
+                    <option value="spend_desc">Расход (↓)</option>
+                    <option value="cpa_desc">CPA (↓)</option>
+                    <option value="cr_asc">CR (↑ хуже)</option>
+                    <option value="ctr_asc">CTR (↑ хуже)</option>
+                  </select>
+                </div>
+
+                <div class="tag" id="campaignsTag">всего: —</div>
+              </div>
+            </div>
+
+            <div class="cardBody">
+              <div class="tableWrap">
+                <table class="campaignsTable table table-sm align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Кампания</th>
+                      <th>Статус</th>
+                      <th class="mono">Расход, ₽</th>
+                      <th class="mono">CTR</th>
+                      <th class="mono">Клики</th>
+                      <th class="mono">CPC, ₽</th>
+                      <th class="mono">Конверсии</th>
+                      <th class="mono">CR</th>
+                      <th class="mono">CPA, ₽</th>
+                    </tr>
+                  </thead>
+                  <tbody id="campaignsBody"></tbody>
+                </table>
+              </div>
+
+              <div class="tableLegend">
+                <span class="legendItem"><span class="chip good"></span>OK</span>
+                <span class="legendItem"><span class="chip warn"></span>Внимание</span>
+                <span class="legendItem"><span class="chip bad"></span>Критично</span>
+                <span class="legendHint">Пороговые значения — демо (замените на свои правила мониторинга).</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="./js/monitoring-utils.js"></script>
+  <script src="./js/monitoring-data.js"></script>
+  <script src="./js/monitoring-kpi.js"></script>
+  <script src="./js/monitoring-chart.js"></script>
+  <script src="./js/monitoring-campaigns.js"></script>
+  <script src="./js/monitoring-channel-alerts.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
