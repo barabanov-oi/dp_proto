@@ -39,7 +39,7 @@
   ns.bindThemeToggle = function bindThemeToggle() {
     const btn = document.getElementById("themeToggle");
     if (!btn) return;
-    ns.applyTheme(localStorage.getItem("monitoring-theme") || "dark");
+    ns.applyTheme(localStorage.getItem("monitoring-theme") || "light");
     btn.addEventListener("click", () => ns.applyTheme(ns.state.theme === "dark" ? "light" : "dark"));
   };
 

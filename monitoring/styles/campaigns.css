@@ -90,15 +90,15 @@
   .campaignDetails td{ padding:10px; }
 }
 
-[data-theme="dark"] .segmented{border-color:rgba(255,255,255,.10);background:rgba(255,255,255,.03);}
+[data-theme="dark"] .segmented{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.09);}
 [data-theme="dark"] .segBtn{color:rgba(255,255,255,.78);}
-[data-theme="dark"] .segBtn:hover{background:rgba(255,255,255,.04);}
-[data-theme="dark"] .segBtn.active{background:rgba(109,94,252,.18);color:rgba(255,255,255,.92);}
-[data-theme="dark"] .tableWrap{border-color:rgba(255,255,255,.08);background:transparent;}
-[data-theme="dark"] .campaignsTable thead th{color:rgba(255,255,255,.70);background:rgba(255,255,255,.04);border-bottom-color:rgba(255,255,255,.08);}
-[data-theme="dark"] .campaignsTable tbody td{border-bottom-color:rgba(255,255,255,.06);color:rgba(255,255,255,.88);}
-[data-theme="dark"] .campaignsTable tbody tr:hover td{background:rgba(255,255,255,.03);}
-[data-theme="dark"] .campaignDetails td{background:rgba(0,0,0,.18);}
+[data-theme="dark"] .segBtn:hover{background:rgba(255,255,255,.12);}
+[data-theme="dark"] .segBtn.active{background:rgba(139,128,255,.32);color:rgba(255,255,255,.96);}
+[data-theme="dark"] .tableWrap{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.05);}
+[data-theme="dark"] .campaignsTable thead th{color:rgba(241,245,249,.92);background:rgba(255,255,255,.11);border-bottom-color:rgba(255,255,255,.18);}
+[data-theme="dark"] .campaignsTable tbody td{border-bottom-color:rgba(255,255,255,.12);color:rgba(255,255,255,.94);}
+[data-theme="dark"] .campaignsTable tbody tr:hover td{background:rgba(255,255,255,.10);}
+[data-theme="dark"] .campaignDetails td{background:rgba(255,255,255,.07);}
 [data-theme="dark"] .detailMetricCard{background:linear-gradient(180deg, rgba(109,94,252,.16), rgba(34,197,94,.08));border-color:rgba(255,255,255,.08);}
 [data-theme="dark"] .detailMetricCard.warn{border-color:rgba(245,158,11,.45);background:linear-gradient(180deg, rgba(245,158,11,.22), rgba(245,158,11,.08));}
 [data-theme="dark"] .detailMetricCard.bad{border-color:rgba(239,68,68,.6);background:linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.08));}
@@ -114,7 +114,7 @@
 [data-theme="dark"] .cellBad{background:rgba(239,68,68,.10);box-shadow: inset 0 0 0 1px rgba(239,68,68,.75);}
 [data-theme="dark"] .spendBar{background:rgba(255,255,255,.06);}
 [data-theme="dark"] .spendBar > i{background:rgba(109,94,252,.55);}
-[data-theme="dark"] .trendInline{border-color:rgba(255,255,255,.10);background:rgba(255,255,255,.03);}
+[data-theme="dark"] .trendInline{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.09);}
 [data-theme="dark"] .trendInline.good{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.10);}
 [data-theme="dark"] .trendInline.warn{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.10);}
 [data-theme="dark"] .trendInline.bad{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.10);}
