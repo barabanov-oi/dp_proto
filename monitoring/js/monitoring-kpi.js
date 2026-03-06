@@ -10,7 +10,9 @@
       axis: isDark ? "rgba(255,255,255,0.60)" : "rgba(24,36,61,0.65)",
       legend: isDark ? "rgba(255,255,255,0.75)" : "rgba(24,36,61,0.80)",
       bars: isDark ? "rgba(109,94,252,0.35)" : "rgba(79,70,229,0.38)",
-      line: rootStyle.getPropertyValue("--good").trim() || "#22c55e"
+      line: rootStyle.getPropertyValue("--good").trim() || "#22c55e",
+      sparkBar: isDark ? "rgba(109,94,252,0.75)" : "rgba(79,70,229,0.78)",
+      detailLine: isDark ? "#8b80ff" : "#6d5efc"
     };
   };
 
@@ -28,6 +30,10 @@
     }
 
     ns.drawChart();
+    ns.renderSparklines();
+    if (document.getElementById("kpiModal")?.classList.contains("open")) {
+      ns.drawKpiDetailChart(ns.state.activeKpiMetric);
+    }
   };
 
   ns.bindThemeToggle = function bindThemeToggle() {
@@ -80,17 +86,47 @@
 
   };
 
-  function renderSparkline(svgId, metric) {
-    const svg = document.getElementById(svgId);
-    if (!svg) return;
+  function renderSparkline(canvasId, metric) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || typeof Chart === "undefined") return;
     const series = ns.getDailyMetric(metric, 7).map((p) => p.value);
-    const max = Math.max(...series);
-    const min = Math.min(...series);
-    const span = max - min || 1;
-    const points = series
-      .map((value, index) => `${((index / (series.length - 1 || 1)) * 120).toFixed(2)},${(32 - ((value - min) / span) * 28 - 2).toFixed(2)}`)
-      .join(" ");
-    svg.innerHTML = `<polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>`;
+    const palette = ns.chartPalette();
+    const existing = ns.state.sparklineCharts?.[canvasId];
+
+    const config = {
+      type: "bar",
+      data: {
+        labels: series.map((_, i) => `${i + 1}`),
+        datasets: [{
+          data: series,
+          backgroundColor: palette.sparkBar,
+          borderRadius: 2,
+          borderSkipped: false,
+          categoryPercentage: 0.9,
+          barPercentage: 0.9
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false, grid: { display: false } },
+          y: { display: false, grid: { display: false }, suggestedMin: 0 }
+        }
+      }
+    };
+
+    if (existing) {
+      existing.data = config.data;
+      existing.options = config.options;
+      existing.update();
+      return;
+    }
+
+    ns.state.sparklineCharts = ns.state.sparklineCharts || {};
+    ns.state.sparklineCharts[canvasId] = new Chart(canvas, config);
   }
 
   ns.renderSparklines = function renderSparklines() {
@@ -106,58 +142,42 @@
 
   ns.drawKpiDetailChart = function drawKpiDetailChart(metric) {
     const canvas = document.getElementById("kpiDetailChart");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    if (!canvas || typeof Chart === "undefined") return;
     const points = ns.getDailyMetric(metric, 14);
-    const values = points.map((p) => p.value);
-    const cssW = canvas.clientWidth || 900;
-    const cssH = canvas.clientHeight || 260;
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(cssW * dpr);
-    canvas.height = Math.floor(cssH * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const palette = ns.chartPalette();
 
-    const pad = { l: 52, r: 24, t: 20, b: 34 };
-    const plotW = cssW - pad.l - pad.r;
-    const plotH = cssH - pad.t - pad.b;
-    const max = Math.max(...values) * 1.1;
-    const min = Math.min(...values) * 0.95;
-    const span = max - min || 1;
+    const data = {
+      labels: points.map((p) => ns.formatDateLabel(p.date)),
+      datasets: [{
+        label: "Значение",
+        data: points.map((p) => p.value),
+        borderColor: palette.detailLine,
+        backgroundColor: "transparent",
+        pointRadius: 2.8,
+        pointBackgroundColor: palette.detailLine,
+        tension: 0.3
+      }]
+    };
 
-    ctx.clearRect(0, 0, cssW, cssH);
-    ctx.fillStyle = ns.chartPalette().bg;
-    ctx.fillRect(0, 0, cssW, cssH);
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: palette.axis, maxTicksLimit: 7 }, grid: { color: palette.grid } },
+        y: { ticks: { color: palette.axis }, grid: { color: palette.grid } }
+      }
+    };
 
-    ctx.strokeStyle = ns.chartPalette().grid;
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (plotH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(pad.l + plotW, y);
-      ctx.stroke();
+    if (ns.state.kpiDetailChartInstance) {
+      ns.state.kpiDetailChartInstance.data = data;
+      ns.state.kpiDetailChartInstance.options = options;
+      ns.state.kpiDetailChartInstance.update();
+      return;
     }
 
-    const xAt = (i) => pad.l + (plotW * i) / (values.length - 1 || 1);
-    const yAt = (v) => pad.t + plotH - ((v - min) / span) * plotH;
-
-    ctx.strokeStyle = "#6d5efc";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    values.forEach((v, i) => (i === 0 ? ctx.moveTo(xAt(i), yAt(v)) : ctx.lineTo(xAt(i), yAt(v))));
-    ctx.stroke();
-
-    ctx.fillStyle = "#6d5efc";
-    values.forEach((v, i) => {
-      ctx.beginPath();
-      ctx.arc(xAt(i), yAt(v), 2.8, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    ctx.fillStyle = ns.chartPalette().axis;
-    ctx.font = "12px ui-sans-serif";
-    for (let i = 0; i < points.length; i += 2) {
-      ctx.fillText(ns.formatDateLabel(points[i].date), xAt(i) - 12, cssH - 10);
-    }
+    ns.state.kpiDetailChartInstance = new Chart(canvas, { type: "line", data, options });
   };
 
   ns.bindKpiCards = function bindKpiCards() {

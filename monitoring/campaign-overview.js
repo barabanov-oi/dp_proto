@@ -70,133 +70,111 @@ function renderKpi() {
   `).join('');
 }
 
+const chartState = { trend: null, pies: {} };
+
 function drawTrendChart() {
   const canvas = document.getElementById('trendChart');
-  const ctx = canvas.getContext('2d');
+  if (!canvas || typeof Chart === 'undefined') return;
+
   const { labels, spend, clicks } = demoCampaign.trend;
-  const width = canvas.width;
-  const height = canvas.height;
-  const pad = { top: 26, right: 56, bottom: 38, left: 62 };
-  const chartW = width - pad.left - pad.right;
-  const chartH = height - pad.top - pad.bottom;
+  const data = {
+    labels,
+    datasets: [
+      {
+        type: 'bar',
+        label: 'Расход',
+        data: spend,
+        yAxisID: 'y',
+        backgroundColor: 'rgba(109,94,252,0.35)',
+        borderColor: '#6d5efc',
+        borderWidth: 1,
+        borderRadius: 5
+      },
+      {
+        type: 'line',
+        label: 'Клики',
+        data: clicks,
+        yAxisID: 'y1',
+        borderColor: '#22c55e',
+        backgroundColor: '#22c55e',
+        pointRadius: 3,
+        tension: 0.35
+      }
+    ]
+  };
 
-  const maxSpend = Math.max(...spend) * 1.1;
-  const maxClicks = Math.max(...clicks) * 1.1;
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { labels: { color: 'rgba(255,255,255,.86)' } }
+    },
+    scales: {
+      x: {
+        ticks: { color: 'rgba(255,255,255,.7)' },
+        grid: { color: 'rgba(255,255,255,.08)' }
+      },
+      y: {
+        position: 'left',
+        ticks: { color: 'rgba(255,255,255,.62)', callback: (value) => fmtNum(Number(value)) },
+        grid: { color: 'rgba(255,255,255,.16)' }
+      },
+      y1: {
+        position: 'right',
+        ticks: { color: 'rgba(255,255,255,.62)', callback: (value) => fmtNum(Number(value)) },
+        grid: { drawOnChartArea: false }
+      }
+    }
+  };
 
-  ctx.clearRect(0, 0, width, height);
-  ctx.strokeStyle = 'rgba(255,255,255,.16)';
-  ctx.lineWidth = 1;
-  ctx.font = '11px sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,.62)';
-
-  for (let i = 0; i < 5; i += 1) {
-    const y = pad.top + (chartH / 4) * i;
-    ctx.beginPath();
-    ctx.moveTo(pad.left, y);
-    ctx.lineTo(width - pad.right, y);
-    ctx.stroke();
-
-    const spendVal = Math.round(maxSpend - (maxSpend / 4) * i);
-    const clicksVal = Math.round(maxClicks - (maxClicks / 4) * i);
-    ctx.fillText(fmtNum(spendVal), 8, y + 4);
-    ctx.fillText(fmtNum(clicksVal), width - pad.right + 8, y + 4);
+  if (chartState.trend) {
+    chartState.trend.data = data;
+    chartState.trend.options = options;
+    chartState.trend.update();
+    return;
   }
 
-  const getX = (index) => pad.left + (chartW / (labels.length - 1)) * index;
-  const getYSpend = (value) => pad.top + chartH - (value / maxSpend) * chartH;
-  const getYClicks = (value) => pad.top + chartH - (value / maxClicks) * chartH;
-
-  ctx.strokeStyle = '#6d5efc';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  spend.forEach((value, index) => {
-    const x = getX(index);
-    const y = getYSpend(value);
-    if (index === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-
-  ctx.fillStyle = 'rgba(109,94,252,.25)';
-  ctx.beginPath();
-  spend.forEach((value, index) => {
-    const x = getX(index);
-    const y = getYSpend(value);
-    if (index === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.lineTo(getX(labels.length - 1), pad.top + chartH);
-  ctx.lineTo(getX(0), pad.top + chartH);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.strokeStyle = '#22c55e';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  clicks.forEach((value, index) => {
-    const x = getX(index);
-    const y = getYClicks(value);
-    if (index === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-
-  labels.forEach((label, index) => {
-    const x = getX(index);
-    ctx.fillStyle = 'rgba(255,255,255,.7)';
-    ctx.fillText(label, x - 10, height - 12);
-
-    ctx.fillStyle = '#6d5efc';
-    ctx.beginPath();
-    ctx.arc(x, getYSpend(spend[index]), 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#22c55e';
-    ctx.beginPath();
-    ctx.arc(x, getYClicks(clicks[index]), 3, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  ctx.fillStyle = 'rgba(255,255,255,.86)';
-  ctx.fillText('● Расход', pad.left, 14);
-  ctx.fillStyle = '#22c55e';
-  ctx.fillText('● Клики', pad.left + 90, 14);
+  chartState.trend = new Chart(canvas, { type: 'bar', data, options });
 }
 
 function drawPie(canvasId, values) {
   const canvas = document.getElementById(canvasId);
-  const ctx = canvas.getContext('2d');
-  const center = { x: canvas.width / 2, y: canvas.height / 2 };
-  const radius = Math.min(canvas.width, canvas.height) / 2 - 10;
-  const total = values.reduce((acc, item) => acc + item.value, 0);
-  let angle = -Math.PI / 2;
+  if (!canvas || typeof Chart === 'undefined') return;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const data = {
+    labels: values.map((item) => item.name),
+    datasets: [{
+      data: values.map((item) => item.value),
+      backgroundColor: values.map((_, index) => colors[index % colors.length]),
+      borderWidth: 0
+    }]
+  };
 
-  values.forEach((item, index) => {
-    const part = (item.value / total) * Math.PI * 2;
-    ctx.beginPath();
-    ctx.moveTo(center.x, center.y);
-    ctx.arc(center.x, center.y, radius, angle, angle + part);
-    ctx.closePath();
-    ctx.fillStyle = colors[index % colors.length];
-    ctx.fill();
-    angle += part;
-  });
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: 'rgba(255,255,255,.76)', boxWidth: 10, boxHeight: 10, padding: 10 }
+      }
+    }
+  };
 
-  ctx.beginPath();
-  ctx.arc(center.x, center.y, radius * 0.52, 0, Math.PI * 2);
-  ctx.fillStyle = '#0f1730';
-  ctx.fill();
+  if (chartState.pies[canvasId]) {
+    chartState.pies[canvasId].data = data;
+    chartState.pies[canvasId].options = options;
+    chartState.pies[canvasId].update();
+    return;
+  }
 
-  ctx.fillStyle = 'rgba(255,255,255,.8)';
-  ctx.font = '11px sans-serif';
-  values.forEach((item, index) => {
-    const y = 16 + index * 14;
-    ctx.fillStyle = colors[index % colors.length];
-    ctx.fillRect(12, y - 8, 8, 8);
-    ctx.fillStyle = 'rgba(255,255,255,.76)';
-    ctx.fillText(`${item.name} ${Math.round((item.value / total) * 100)}%`, 26, y);
+  chartState.pies[canvasId] = new Chart(canvas, {
+    type: 'doughnut',
+    data,
+    options
   });
 }
 
@@ -361,6 +339,11 @@ function init() {
   renderSliceCards();
   renderGroupsTable();
   renderNetworksTable();
+
+  window.addEventListener('resize', () => {
+    drawTrendChart();
+    renderPies();
+  });
 }
 
 init();

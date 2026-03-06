@@ -36,89 +36,82 @@
 
   ns.drawChart = function drawChart() {
     const canvas = document.getElementById("chart");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    if (!canvas || typeof Chart === "undefined") return;
 
-    const cssW = canvas.clientWidth || 900;
-    const cssH = canvas.clientHeight || 260;
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(cssW * dpr);
-    canvas.height = Math.floor(cssH * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    const pad = { l: 52, r: 52, t: 22, b: 34 };
-    const plotW = cssW - pad.l - pad.r;
-    const plotH = cssH - pad.t - pad.b;
-    const chart = ns.getChartSeries();
-
-    const maxLeft = Math.max(...chart.left) * 1.08;
-    const maxRight = Math.max(...chart.right) * 1.12;
     const palette = ns.chartPalette();
-
-    ctx.clearRect(0, 0, cssW, cssH);
-    ctx.fillStyle = palette.bg;
-    ctx.fillRect(0, 0, cssW, cssH);
-
-    ctx.strokeStyle = palette.grid;
-    ctx.lineWidth = 1;
-    for (let i = 0; i <= 5; i++) {
-      const y = pad.t + (plotH * i) / 5;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(pad.l + plotW, y);
-      ctx.stroke();
-    }
-
-    ctx.fillStyle = palette.axis;
-    ctx.font = "12px ui-sans-serif, system-ui";
-    ctx.textBaseline = "middle";
-    ctx.textAlign = "left";
-
-    for (let i = 0; i <= 5; i++) {
-      const y = pad.t + (plotH * i) / 5;
-      ctx.fillText(chart.leftFormatter(maxLeft - (maxLeft * i) / 5), 10, y);
-    }
-
-    ctx.textAlign = "right";
-    for (let i = 0; i <= 5; i++) {
-      const y = pad.t + (plotH * i) / 5;
-      ctx.fillText(chart.rightFormatter(maxRight - (maxRight * i) / 5), cssW - 10, y);
-    }
-
-    const xAt = (i) => pad.l + (plotW * i) / (chart.points.length - 1);
-    const yLeft = (v) => pad.t + plotH - (plotH * v) / maxLeft;
-    const yRight = (v) => pad.t + plotH - (plotH * v) / maxRight;
-
-    ctx.textAlign = "left";
-    ctx.textBaseline = "alphabetic";
-    for (let i = 0; i < chart.points.length; i += 2) {
-      ctx.fillText(ns.formatDateLabel(chart.points[i].date), xAt(i) - 12, cssH - 10);
-    }
-
-    const barW = (plotW / chart.points.length) * 0.55;
-    ctx.fillStyle = palette.bars;
-    chart.points.forEach((_, i) => {
-      const y = yLeft(chart.left[i]);
-      ctx.fillRect(xAt(i) - barW / 2, y, barW, pad.t + plotH - y);
-    });
-
-    ctx.strokeStyle = palette.line;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    chart.points.forEach((_, i) => (i ? ctx.lineTo(xAt(i), yRight(chart.right[i])) : ctx.moveTo(xAt(i), yRight(chart.right[i]))));
-    ctx.stroke();
-
-    ctx.fillStyle = palette.line;
-    chart.points.forEach((_, i) => {
-      ctx.beginPath();
-      ctx.arc(xAt(i), yRight(chart.right[i]), 3, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
+    const chartData = ns.getChartSeries();
     const channelLabel = ns.state.chartChannel === "all" ? "все каналы" : ns.state.chartChannel === "search" ? "поиск" : "РСЯ";
-    ctx.fillStyle = palette.legend;
-    ctx.fillText(`▮ ${chart.leftLabel} (${channelLabel})`, pad.l, 16);
-    ctx.fillStyle = palette.line;
-    ctx.fillText(`— ${chart.rightLabel} (правая шкала)`, pad.l + 210, 16);
+
+    const data = {
+      labels: chartData.points.map((p) => ns.formatDateLabel(p.date)),
+      datasets: [
+        {
+          type: "bar",
+          label: `${chartData.leftLabel} (${channelLabel})`,
+          data: chartData.left,
+          backgroundColor: palette.bars,
+          borderRadius: 5,
+          yAxisID: "y"
+        },
+        {
+          type: "line",
+          label: `${chartData.rightLabel} (правая шкала)`,
+          data: chartData.right,
+          yAxisID: "y1",
+          borderColor: palette.line,
+          backgroundColor: palette.line,
+          pointRadius: 3,
+          pointHoverRadius: 4,
+          tension: 0.35
+        }
+      ]
+    };
+
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { labels: { color: palette.legend } },
+        tooltip: {
+          callbacks: {
+            label(context) {
+              const formatter = context.datasetIndex === 0 ? chartData.leftFormatter : chartData.rightFormatter;
+              return `${context.dataset.label}: ${formatter(context.raw)}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: palette.axis, maxTicksLimit: 7 },
+          grid: { color: palette.grid }
+        },
+        y: {
+          position: "left",
+          ticks: { color: palette.axis, callback: (val) => chartData.leftFormatter(Number(val)) },
+          grid: { color: palette.grid }
+        },
+        y1: {
+          position: "right",
+          ticks: { color: palette.axis, callback: (val) => chartData.rightFormatter(Number(val)) },
+          grid: { drawOnChartArea: false, color: palette.grid }
+        }
+      }
+    };
+
+    if (ns.state.mainChartInstance) {
+      ns.state.mainChartInstance.data = data;
+      ns.state.mainChartInstance.options = options;
+      ns.state.mainChartInstance.update();
+      return;
+    }
+
+    ns.state.mainChartInstance = new Chart(canvas, {
+      type: "bar",
+      data,
+      options
+    });
   };
 })();
