@@ -10,7 +10,8 @@
       axis: isDark ? "rgba(255,255,255,0.60)" : "rgba(24,36,61,0.65)",
       legend: isDark ? "rgba(255,255,255,0.75)" : "rgba(24,36,61,0.80)",
       bars: isDark ? "rgba(109,94,252,0.35)" : "rgba(79,70,229,0.38)",
-      line: rootStyle.getPropertyValue("--good").trim() || "#22c55e"
+      line: rootStyle.getPropertyValue("--good").trim() || "#22c55e",
+      accent: rootStyle.getPropertyValue("--accent").trim() || "#6d5efc"
     };
   };
 
@@ -28,6 +29,8 @@
     }
 
     ns.drawChart();
+    if (ns.state.activeKpiMetric) ns.drawKpiDetailChart(ns.state.activeKpiMetric);
+    ns.renderSparklines();
   };
 
   ns.bindThemeToggle = function bindThemeToggle() {
@@ -78,19 +81,60 @@
       card.classList.toggle("kpiCritical", Boolean(delta && delta.classList.contains("bad")));
     });
 
+    document.getElementById("lastUpdateTag").textContent = `Обновлено: ${new Date().toLocaleString("ru-RU")}`;
   };
 
+  function toSparkCanvas(svgId) {
+    const el = document.getElementById(svgId);
+    if (!el) return null;
+    if (el.tagName.toLowerCase() === "canvas") return el;
+
+    const canvas = document.createElement("canvas");
+    canvas.id = svgId;
+    canvas.className = el.className.baseVal || "kpiSparkline";
+    canvas.width = 120;
+    canvas.height = 32;
+    canvas.setAttribute("aria-hidden", "true");
+    el.replaceWith(canvas);
+    return canvas;
+  }
+
   function renderSparkline(svgId, metric) {
-    const svg = document.getElementById(svgId);
-    if (!svg) return;
-    const series = ns.getDailyMetric(metric, 7).map((p) => p.value);
-    const max = Math.max(...series);
-    const min = Math.min(...series);
-    const span = max - min || 1;
-    const points = series
-      .map((value, index) => `${((index / (series.length - 1 || 1)) * 120).toFixed(2)},${(32 - ((value - min) / span) * 28 - 2).toFixed(2)}`)
-      .join(" ");
-    svg.innerHTML = `<polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>`;
+    if (typeof Chart === "undefined") return;
+    const canvas = toSparkCanvas(svgId);
+    if (!canvas) return;
+
+    const points = ns.getDailyMetric(metric, 7);
+    const palette = ns.chartPalette();
+
+    ns.charts = ns.charts || {};
+    if (ns.charts[svgId]) ns.charts[svgId].destroy();
+
+    ns.charts[svgId] = new Chart(canvas, {
+      type: "line",
+      data: {
+        labels: points.map((p) => ns.formatDateLabel(p.date)),
+        datasets: [{
+          data: points.map((p) => p.value),
+          borderColor: palette.accent,
+          backgroundColor: "transparent",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false }
+        },
+        elements: { line: { capBezierPoints: true } }
+      }
+    });
   }
 
   ns.renderSparklines = function renderSparklines() {
@@ -106,58 +150,46 @@
 
   ns.drawKpiDetailChart = function drawKpiDetailChart(metric) {
     const canvas = document.getElementById("kpiDetailChart");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    if (!canvas || typeof Chart === "undefined") return;
+
     const points = ns.getDailyMetric(metric, 14);
-    const values = points.map((p) => p.value);
-    const cssW = canvas.clientWidth || 900;
-    const cssH = canvas.clientHeight || 260;
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(cssW * dpr);
-    canvas.height = Math.floor(cssH * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const palette = ns.chartPalette();
 
-    const pad = { l: 52, r: 24, t: 20, b: 34 };
-    const plotW = cssW - pad.l - pad.r;
-    const plotH = cssH - pad.t - pad.b;
-    const max = Math.max(...values) * 1.1;
-    const min = Math.min(...values) * 0.95;
-    const span = max - min || 1;
+    ns.charts = ns.charts || {};
+    if (ns.charts.kpiDetailChart) ns.charts.kpiDetailChart.destroy();
 
-    ctx.clearRect(0, 0, cssW, cssH);
-    ctx.fillStyle = ns.chartPalette().bg;
-    ctx.fillRect(0, 0, cssW, cssH);
-
-    ctx.strokeStyle = ns.chartPalette().grid;
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (plotH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(pad.l + plotW, y);
-      ctx.stroke();
-    }
-
-    const xAt = (i) => pad.l + (plotW * i) / (values.length - 1 || 1);
-    const yAt = (v) => pad.t + plotH - ((v - min) / span) * plotH;
-
-    ctx.strokeStyle = "#6d5efc";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    values.forEach((v, i) => (i === 0 ? ctx.moveTo(xAt(i), yAt(v)) : ctx.lineTo(xAt(i), yAt(v))));
-    ctx.stroke();
-
-    ctx.fillStyle = "#6d5efc";
-    values.forEach((v, i) => {
-      ctx.beginPath();
-      ctx.arc(xAt(i), yAt(v), 2.8, 0, Math.PI * 2);
-      ctx.fill();
+    ns.charts.kpiDetailChart = new Chart(canvas, {
+      type: "line",
+      data: {
+        labels: points.map((p) => ns.formatDateLabel(p.date)),
+        datasets: [{
+          label: metric,
+          data: points.map((p) => p.value),
+          borderColor: palette.accent,
+          backgroundColor: "rgba(109,94,252,0.15)",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3,
+          pointHoverRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            ticks: { color: palette.axis, maxTicksLimit: 7 },
+            grid: { color: palette.grid }
+          },
+          y: {
+            ticks: { color: palette.axis },
+            grid: { color: palette.grid }
+          }
+        }
+      }
     });
-
-    ctx.fillStyle = ns.chartPalette().axis;
-    ctx.font = "12px ui-sans-serif";
-    for (let i = 0; i < points.length; i += 2) {
-      ctx.fillText(ns.formatDateLabel(points[i].date), xAt(i) - 12, cssH - 10);
-    }
   };
 
   ns.bindKpiCards = function bindKpiCards() {
