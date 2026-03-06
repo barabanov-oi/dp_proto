@@ -43,6 +43,7 @@
     const el = document.createElement("span");
     el.className = `trendInline ${trendClass(value, inverse)}`;
     el.textContent = `${value >= 0 ? "↑" : "↓"} ${Math.abs(value).toFixed(1)}%`;
+    el.style.display = "inline-flex";
     return el;
   }
 
@@ -70,6 +71,7 @@
       spendCell.dataset.label = "Расход";
       spendCell.className = "mono spendCell";
       spendCell.textContent = ns.formatMoney(r.spend, 2);
+      spendCell.appendChild(document.createElement("br"));
       spendCell.appendChild(createTrendElement(trend.spend ?? 0, true));
       const bar = document.createElement("div");
       bar.className = "spendBar";
@@ -85,6 +87,7 @@
           td.dataset.label = label;
           td.className = `mono ${metric ? cellClass(r[metric], metric) : ""}`;
           td.textContent = value;
+          td.appendChild(document.createElement("br"));
           td.appendChild(createTrendElement(trend[trendKey] ?? 0, inverse));
           tr.appendChild(td);
         });

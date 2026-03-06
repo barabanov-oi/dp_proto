@@ -11,7 +11,7 @@
 <body>
   <div class="container-fluid py-3 min-vh-100">
     <div class="row g-3">
-      <aside class="col-12 col-xl-3">
+      <aside class="col-12 col-xl-2 monitoringSidebar">
         <div class="card h-100 shadow-sm border-0">
           <div class="card-body d-flex flex-column gap-3">
             <div class="d-flex align-items-center gap-2">
@@ -32,34 +32,24 @@
               <a href="#" class="nav-link"><span class="dot"></span>Уведомления</a>
             </nav>
 
-            <div class="mt-auto p-3 bg-body-tertiary rounded-3 border">
-              <div class="fw-semibold">Статус панели</div>
-              <div class="text-secondary mt-2 small">
-                Данные примерные. Подключите аккаунт, чтобы получать реальные метрики по API.
-              </div>
-              <span class="badge rounded-pill text-bg-success mt-3"><span class="k"></span>Статус: OK</span>
-            </div>
           </div>
         </div>
       </aside>
 
-      <main class="col-12 col-xl-9">
+      <main class="col-12 col-xl-10">
         <section class="card shadow-sm border-0 mb-3">
           <div class="card-body d-flex flex-column gap-3">
             <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
               <div>
                 <h2 class="h4 mb-1">Мониторинг базовых показателей</h2>
-                <p class="text-secondary mb-0">Сводный контроль расходов, трафика и эффективности по аккаунту. Демо-данные за последние 14 дней.</p>
               </div>
               <button class="btn btn-outline-secondary" id="themeToggle" type="button" aria-pressed="false">🌙 Тёмная тема</button>
             </div>
 
             <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
-              <div class="d-inline-flex align-items-center gap-3 px-3 py-2 bg-body-tertiary border rounded-3">
-                <div>
-                  <div class="small text-secondary">Остаток баланса</div>
-                  <div class="mono fw-semibold" id="kpiBalance">—</div>
-                </div>
+              <div class="d-inline-flex flex-column align-items-start gap-1 px-3 py-2 bg-body-tertiary border rounded-3">
+                <div class="small text-secondary">Остаток баланса</div>
+                <div class="mono fw-bold fs-4 lh-1" id="kpiBalance">—</div>
                 <span class="badge text-bg-light border">Хватит на ~5 дней</span>
               </div>
 
@@ -81,21 +71,22 @@
                     <option value="28">28 дней</option>
                   </select>
                 </div>
-                <button class="btn btn-primary" id="refreshBtn" type="button">🔄 Обновить</button>
               </div>
             </div>
+
+            <p class="text-secondary mb-0">Сводный контроль расходов, трафика и эффективности по аккаунту. Демо-данные за последние 14 дней.</p>
           </div>
         </section>
 
-        <section class="row g-3 mb-3" aria-label="Показатели">
-          <div class="col-12 col-sm-6 col-xxl-3"><div class="card h-100 kpiCard" data-metric="spend" role="button" tabindex="0"><div class="card-body"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">Расход</div><span class="delta warn" id="deltaSpend">▲ 0.0%</span></div><div class="h4 mono my-2" id="kpiSpend">—</div><canvas class="kpiSparkline" id="sparkSpend" aria-hidden="true"></canvas></div></div></div>
-          <div class="col-12 col-sm-6 col-xxl-3"><div class="card h-100 kpiCard" data-metric="impressions" role="button" tabindex="0"><div class="card-body"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">Показы</div><span class="delta good" id="deltaImpr">▲ 0.0%</span></div><div class="h4 mono my-2" id="kpiImpr">—</div><canvas class="kpiSparkline" id="sparkImpressions" aria-hidden="true"></canvas></div></div></div>
-          <div class="col-12 col-sm-6 col-xxl-3"><div class="card h-100 kpiCard" data-metric="ctr" role="button" tabindex="0"><div class="card-body"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">CTR</div><span class="delta good" id="deltaCtr">▲ 0.0%</span></div><div class="h4 mono my-2" id="kpiCtr">—</div><canvas class="kpiSparkline" id="sparkCtr" aria-hidden="true"></canvas></div></div></div>
-          <div class="col-12 col-sm-6 col-xxl-3"><div class="card h-100 kpiCard" data-metric="clicks" role="button" tabindex="0"><div class="card-body"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">Клики</div><span class="delta good" id="deltaClicks">▲ 0.0%</span></div><div class="h4 mono my-2" id="kpiClicks">—</div><canvas class="kpiSparkline" id="sparkClicks" aria-hidden="true"></canvas></div></div></div>
-          <div class="col-12 col-sm-6 col-xxl-3"><div class="card h-100 kpiCard" data-metric="cpc" role="button" tabindex="0"><div class="card-body"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">CPC</div><span class="delta warn" id="deltaCpc">▲ 0.0%</span></div><div class="h4 mono my-2" id="kpiCpc">—</div><canvas class="kpiSparkline" id="sparkCpc" aria-hidden="true"></canvas></div></div></div>
-          <div class="col-12 col-sm-6 col-xxl-3"><div class="card h-100 kpiCard" data-metric="conversions" role="button" tabindex="0"><div class="card-body"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">Конверсии</div><span class="delta good" id="deltaConv">▲ 0.0%</span></div><div class="h4 mono my-2" id="kpiConv">—</div><canvas class="kpiSparkline" id="sparkConversions" aria-hidden="true"></canvas></div></div></div>
-          <div class="col-12 col-sm-6 col-xxl-3"><div class="card h-100 kpiCard" data-metric="cr" role="button" tabindex="0"><div class="card-body"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">CR</div><span class="delta bad" id="deltaCr">▲ 0.0%</span></div><div class="h4 mono my-2" id="kpiCr">—</div><canvas class="kpiSparkline" id="sparkCr" aria-hidden="true"></canvas></div></div></div>
-          <div class="col-12 col-sm-6 col-xxl-3"><div class="card h-100 kpiCard" data-metric="cpa" role="button" tabindex="0"><div class="card-body"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">CPA</div><span class="delta bad" id="deltaCpa">▲ 0.0%</span></div><div class="h4 mono my-2" id="kpiCpa">—</div><canvas class="kpiSparkline" id="sparkCpa" aria-hidden="true"></canvas></div></div></div>
+        <section class="row row-cols-1 row-cols-sm-2 row-cols-xl-5 g-2 mb-3" aria-label="Показатели">
+          <div class="col"><div class="card h-100 kpiCard" data-metric="spend" role="button" tabindex="0"><div class="card-body p-0"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">Расход</div><span class="delta warn" id="deltaSpend">▲ 0.0%</span></div><div class="h5 mono my-1" id="kpiSpend">—</div><canvas class="kpiSparkline" id="sparkSpend" aria-hidden="true"></canvas></div></div></div>
+          <div class="col"><div class="card h-100 kpiCard" data-metric="impressions" role="button" tabindex="0"><div class="card-body p-0"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">Показы</div><span class="delta good" id="deltaImpr">▲ 0.0%</span></div><div class="h5 mono my-1" id="kpiImpr">—</div><canvas class="kpiSparkline" id="sparkImpressions" aria-hidden="true"></canvas></div></div></div>
+          <div class="col"><div class="card h-100 kpiCard" data-metric="ctr" role="button" tabindex="0"><div class="card-body p-0"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">CTR</div><span class="delta good" id="deltaCtr">▲ 0.0%</span></div><div class="h5 mono my-1" id="kpiCtr">—</div><canvas class="kpiSparkline" id="sparkCtr" aria-hidden="true"></canvas></div></div></div>
+          <div class="col"><div class="card h-100 kpiCard" data-metric="clicks" role="button" tabindex="0"><div class="card-body p-0"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">Клики</div><span class="delta good" id="deltaClicks">▲ 0.0%</span></div><div class="h5 mono my-1" id="kpiClicks">—</div><canvas class="kpiSparkline" id="sparkClicks" aria-hidden="true"></canvas></div></div></div>
+          <div class="col"><div class="card h-100 kpiCard" data-metric="cpc" role="button" tabindex="0"><div class="card-body p-0"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">CPC</div><span class="delta warn" id="deltaCpc">▲ 0.0%</span></div><div class="h5 mono my-1" id="kpiCpc">—</div><canvas class="kpiSparkline" id="sparkCpc" aria-hidden="true"></canvas></div></div></div>
+          <div class="col"><div class="card h-100 kpiCard" data-metric="conversions" role="button" tabindex="0"><div class="card-body p-0"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">Конверсии</div><span class="delta good" id="deltaConv">▲ 0.0%</span></div><div class="h5 mono my-1" id="kpiConv">—</div><canvas class="kpiSparkline" id="sparkConversions" aria-hidden="true"></canvas></div></div></div>
+          <div class="col"><div class="card h-100 kpiCard" data-metric="cr" role="button" tabindex="0"><div class="card-body p-0"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">CR</div><span class="delta bad" id="deltaCr">▲ 0.0%</span></div><div class="h5 mono my-1" id="kpiCr">—</div><canvas class="kpiSparkline" id="sparkCr" aria-hidden="true"></canvas></div></div></div>
+          <div class="col"><div class="card h-100 kpiCard" data-metric="cpa" role="button" tabindex="0"><div class="card-body p-0"><div class="d-flex justify-content-between align-items-start"><div class="small text-secondary">CPA</div><span class="delta bad" id="deltaCpa">▲ 0.0%</span></div><div class="h5 mono my-1" id="kpiCpa">—</div><canvas class="kpiSparkline" id="sparkCpa" aria-hidden="true"></canvas></div></div></div>
         </section>
 
         <div class="kpiModal" id="kpiModal" aria-hidden="true">

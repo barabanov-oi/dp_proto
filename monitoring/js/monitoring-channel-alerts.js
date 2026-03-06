@@ -34,14 +34,14 @@
       return `
         <tr>
           <td>${label}</td>
-          <td class="mono">${ns.formatMoney(totals.spend, 0)} <span class="trendInline" data-delta="${delta.spend ?? 0}"></span></td>
+          <td class="mono">${ns.formatMoney(totals.spend, 0)}<br><span class="trendInline" data-delta="${delta.spend ?? 0}"></span></td>
           <td class="mono">${ns.formatInt(totals.impressions)}</td>
-          <td class="mono">${ns.formatInt(totals.clicks)} <span class="trendInline" data-delta="${delta.clicks ?? 0}"></span></td>
-          <td class="mono">${ns.formatPct(ctr, 2)} <span class="trendInline" data-delta="${delta.ctr ?? 0}"></span></td>
-          <td class="mono">${ns.formatMoney(cpc, 2)} <span class="trendInline" data-delta="${delta.cpc ?? 0}"></span></td>
-          <td class="mono">${ns.formatInt(totals.conversions)} <span class="trendInline" data-delta="${delta.conversions ?? 0}"></span></td>
-          <td class="mono">${ns.formatPct(cr, 2)} <span class="trendInline" data-delta="${delta.cr ?? 0}"></span></td>
-          <td class="mono">${ns.formatMoney(cpa, 2)} <span class="trendInline" data-delta="${delta.cpa ?? 0}"></span></td>
+          <td class="mono">${ns.formatInt(totals.clicks)}<br><span class="trendInline" data-delta="${delta.clicks ?? 0}"></span></td>
+          <td class="mono">${ns.formatPct(ctr, 2)}<br><span class="trendInline" data-delta="${delta.ctr ?? 0}"></span></td>
+          <td class="mono">${ns.formatMoney(cpc, 2)}<br><span class="trendInline" data-delta="${delta.cpc ?? 0}"></span></td>
+          <td class="mono">${ns.formatInt(totals.conversions)}<br><span class="trendInline" data-delta="${delta.conversions ?? 0}"></span></td>
+          <td class="mono">${ns.formatPct(cr, 2)}<br><span class="trendInline" data-delta="${delta.cr ?? 0}"></span></td>
+          <td class="mono">${ns.formatMoney(cpa, 2)}<br><span class="trendInline" data-delta="${delta.cpa ?? 0}"></span></td>
         </tr>
       `;
     }).join("");

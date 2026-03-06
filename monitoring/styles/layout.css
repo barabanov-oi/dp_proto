@@ -25,6 +25,11 @@ a{color:inherit; text-decoration:none}
 .muted{color:var(--muted)}
 .mono{font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;}
 
+.monitoringSidebar{max-width:240px;}
+@media (min-width: 1200px){
+  .monitoringSidebar{flex:0 0 220px;}
+}
+
 .app{
   display:grid;
   grid-template-columns: 280px 1fr;
@@ -121,12 +126,12 @@ select, input[type="date"]{
 
 .kpiGrid{display:grid;grid-template-columns: repeat(4, minmax(0, 1fr));gap:14px;margin-bottom:14px;}
 .kpiCard{
-  background:#fff;border:1px solid #dce6f4;border-radius: var(--radius);box-shadow: var(--shadow);padding:14px;
+  background:#fff;border:1px solid #dce6f4;border-radius: var(--radius);box-shadow: var(--shadow);padding:8px;min-height:104px;
 }
 .kpiTop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
 .kpiLabel{font-size:14px;font-weight:700;letter-spacing:.2px;}
 .kpiValue{font-size:24px;font-weight:800;letter-spacing:.2px;}
-.kpiSparkline{width:120px;max-width:100%;height:32px !important;max-height:32px;display:block;margin-top:8px;margin-left:0;}
+.kpiSparkline{width:60px;max-width:100%;height:24px !important;max-height:24px;display:block;margin-top:4px;margin-left:0;}
 .kpiCard[role="button"]{cursor:pointer;transition:transform .15s ease, border-color .15s ease;}
 .kpiCard[role="button"]:hover{transform:translateY(-1px);border-color:#b9cbeb;}
 .kpiCard[role="button"]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}

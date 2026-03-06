@@ -100,10 +100,10 @@
         datasets: [{
           data: series,
           backgroundColor: palette.sparkBar,
-          borderRadius: 2,
+          borderRadius: 0,
           borderSkipped: false,
-          categoryPercentage: 0.9,
-          barPercentage: 0.9
+          categoryPercentage: 1,
+          barPercentage: 1
         }]
       },
       options: {

@@ -48,7 +48,7 @@
 .spendBar{position:absolute;left:10px;right:10px;bottom:6px;height:6px;border-radius:999px;background:#e5ecf8;overflow:hidden;}
 .spendBar > i{display:block;height:100%;width:0%;background:rgba(79,70,229,.55);border-radius:999px;}
 
-.trendInline{display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:1px 5px;border-radius:999px;font-size:10px;font-weight:700;line-height:1;border:1px solid #d8e1ef;background:#f8faff;vertical-align:middle;}
+.trendInline{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:1px 5px;border-radius:999px;font-size:10px;font-weight:700;line-height:1;border:1px solid #d8e1ef;background:#f8faff;vertical-align:middle;}
 .trendInline.good{border-color:#b7e8ca;background:#ebfaef;}
 .trendInline.warn{border-color:#f5d09d;background:#fff5e9;}
 .trendInline.bad{border-color:#f4bbbb;background:#ffeded;}
@@ -125,3 +125,10 @@
   [data-theme="dark"] .campaignRow{border-color:rgba(255,255,255,.10);background:rgba(255,255,255,.03);}
   [data-theme="dark"] .campaignsTable tbody tr.campaignRow td:not(.campaignNameCell)::before{color:rgba(255,255,255,.62);}
 }
+
+
+.channelTable td .trendInline,
+.campaignsTable td .trendInline{display:inline-flex;}
+
+.channelTable td.mono,
+.campaignsTable td.mono{line-height:1.25;}
