@@ -46,14 +46,14 @@
               <button class="btn btn-outline-secondary" id="themeToggle" type="button" aria-pressed="false">🌙 Тёмная тема</button>
             </div>
 
-            <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
-              <div class="d-inline-flex flex-column align-items-start gap-1 px-3 py-2 pb-3 bg-body-tertiary border rounded-3 balanceCard">
+            <div class="d-flex flex-wrap flex-xl-nowrap align-items-start justify-content-between gap-3">
+              <div class="d-inline-flex flex-column align-items-start gap-2 px-4 py-3 bg-body-tertiary border rounded-4 balanceCard">
                 <div class="small text-secondary">Остаток баланса</div>
-                <div class="mono fw-bold fs-4 lh-1" id="kpiBalance">—</div>
+                <div class="mono fw-bold fs-4 lh-1 balanceValue" id="kpiBalance">—</div>
                 <span class="badge text-bg-light border d-inline-flex align-items-center gap-2"><span class="balanceIndicator" aria-hidden="true"></span>Хватит на ~5 дней</span>
               </div>
 
-              <div class="d-flex flex-wrap align-items-end gap-2">
+              <div class="d-flex flex-wrap align-items-end gap-2 balanceControls">
                 <div>
                   <label for="account" class="form-label form-label-sm mb-1">Аккаунт</label>
                   <select id="account" class="form-select form-select-sm">
