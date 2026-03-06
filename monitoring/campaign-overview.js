@@ -45,6 +45,7 @@ const demoCampaign = {
 };
 
 const colors = ['#6d5efc', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4', '#a855f7'];
+const charts = {};
 
 function fmtNum(value) {
   return new Intl.NumberFormat('ru-RU').format(value);
@@ -72,132 +73,126 @@ function renderKpi() {
 
 function drawTrendChart() {
   const canvas = document.getElementById('trendChart');
-  const ctx = canvas.getContext('2d');
+  if (!canvas || typeof Chart === 'undefined') return;
+
   const { labels, spend, clicks } = demoCampaign.trend;
-  const width = canvas.width;
-  const height = canvas.height;
-  const pad = { top: 26, right: 56, bottom: 38, left: 62 };
-  const chartW = width - pad.left - pad.right;
-  const chartH = height - pad.top - pad.bottom;
 
-  const maxSpend = Math.max(...spend) * 1.1;
-  const maxClicks = Math.max(...clicks) * 1.1;
+  const config = {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Расход',
+          data: spend,
+          yAxisID: 'ySpend',
+          backgroundColor: 'rgba(109,94,252,.25)',
+          borderColor: '#6d5efc',
+          borderWidth: 1,
+          borderRadius: 4
+        },
+        {
+          type: 'line',
+          label: 'Клики',
+          data: clicks,
+          yAxisID: 'yClicks',
+          borderColor: '#22c55e',
+          backgroundColor: '#22c55e',
+          pointRadius: 3,
+          tension: 0.28
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: 'rgba(255,255,255,.86)' } }
+      },
+      scales: {
+        x: {
+          ticks: { color: 'rgba(255,255,255,.7)' },
+          grid: { color: 'rgba(255,255,255,.08)' }
+        },
+        ySpend: {
+          type: 'linear',
+          position: 'left',
+          ticks: {
+            color: 'rgba(255,255,255,.62)',
+            callback: (v) => fmtNum(v)
+          },
+          grid: { color: 'rgba(255,255,255,.16)' }
+        },
+        yClicks: {
+          type: 'linear',
+          position: 'right',
+          ticks: {
+            color: 'rgba(255,255,255,.62)',
+            callback: (v) => fmtNum(v)
+          },
+          grid: { drawOnChartArea: false }
+        }
+      }
+    }
+  };
 
-  ctx.clearRect(0, 0, width, height);
-  ctx.strokeStyle = 'rgba(255,255,255,.16)';
-  ctx.lineWidth = 1;
-  ctx.font = '11px sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,.62)';
-
-  for (let i = 0; i < 5; i += 1) {
-    const y = pad.top + (chartH / 4) * i;
-    ctx.beginPath();
-    ctx.moveTo(pad.left, y);
-    ctx.lineTo(width - pad.right, y);
-    ctx.stroke();
-
-    const spendVal = Math.round(maxSpend - (maxSpend / 4) * i);
-    const clicksVal = Math.round(maxClicks - (maxClicks / 4) * i);
-    ctx.fillText(fmtNum(spendVal), 8, y + 4);
-    ctx.fillText(fmtNum(clicksVal), width - pad.right + 8, y + 4);
+  if (charts.trend) {
+    charts.trend.data = config.data;
+    charts.trend.options = config.options;
+    charts.trend.update();
+    return;
   }
 
-  const getX = (index) => pad.left + (chartW / (labels.length - 1)) * index;
-  const getYSpend = (value) => pad.top + chartH - (value / maxSpend) * chartH;
-  const getYClicks = (value) => pad.top + chartH - (value / maxClicks) * chartH;
-
-  ctx.strokeStyle = '#6d5efc';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  spend.forEach((value, index) => {
-    const x = getX(index);
-    const y = getYSpend(value);
-    if (index === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-
-  ctx.fillStyle = 'rgba(109,94,252,.25)';
-  ctx.beginPath();
-  spend.forEach((value, index) => {
-    const x = getX(index);
-    const y = getYSpend(value);
-    if (index === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.lineTo(getX(labels.length - 1), pad.top + chartH);
-  ctx.lineTo(getX(0), pad.top + chartH);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.strokeStyle = '#22c55e';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  clicks.forEach((value, index) => {
-    const x = getX(index);
-    const y = getYClicks(value);
-    if (index === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-
-  labels.forEach((label, index) => {
-    const x = getX(index);
-    ctx.fillStyle = 'rgba(255,255,255,.7)';
-    ctx.fillText(label, x - 10, height - 12);
-
-    ctx.fillStyle = '#6d5efc';
-    ctx.beginPath();
-    ctx.arc(x, getYSpend(spend[index]), 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#22c55e';
-    ctx.beginPath();
-    ctx.arc(x, getYClicks(clicks[index]), 3, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  ctx.fillStyle = 'rgba(255,255,255,.86)';
-  ctx.fillText('● Расход', pad.left, 14);
-  ctx.fillStyle = '#22c55e';
-  ctx.fillText('● Клики', pad.left + 90, 14);
+  charts.trend = new Chart(canvas, config);
 }
 
-function drawPie(canvasId, values) {
+function drawPie(canvasId, values, title) {
   const canvas = document.getElementById(canvasId);
-  const ctx = canvas.getContext('2d');
-  const center = { x: canvas.width / 2, y: canvas.height / 2 };
-  const radius = Math.min(canvas.width, canvas.height) / 2 - 10;
-  const total = values.reduce((acc, item) => acc + item.value, 0);
-  let angle = -Math.PI / 2;
+  if (!canvas || typeof Chart === 'undefined') return;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const config = {
+    type: 'doughnut',
+    data: {
+      labels: values.map((item) => item.name),
+      datasets: [{
+        data: values.map((item) => item.value),
+        backgroundColor: values.map((_, index) => colors[index % colors.length]),
+        borderWidth: 0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '52%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: 'rgba(255,255,255,.76)', boxWidth: 10, boxHeight: 10 }
+        },
+        tooltip: {
+          callbacks: {
+            label(context) {
+              const total = context.dataset.data.reduce((sum, v) => sum + v, 0);
+              const pct = total ? Math.round((context.parsed / total) * 100) : 0;
+              return `${context.label}: ${fmtNum(context.parsed)} (${pct}%)`;
+            },
+            title: () => title
+          }
+        }
+      }
+    }
+  };
 
-  values.forEach((item, index) => {
-    const part = (item.value / total) * Math.PI * 2;
-    ctx.beginPath();
-    ctx.moveTo(center.x, center.y);
-    ctx.arc(center.x, center.y, radius, angle, angle + part);
-    ctx.closePath();
-    ctx.fillStyle = colors[index % colors.length];
-    ctx.fill();
-    angle += part;
-  });
+  if (charts[canvasId]) {
+    charts[canvasId].data = config.data;
+    charts[canvasId].update();
+    return;
+  }
 
-  ctx.beginPath();
-  ctx.arc(center.x, center.y, radius * 0.52, 0, Math.PI * 2);
-  ctx.fillStyle = '#0f1730';
-  ctx.fill();
-
-  ctx.fillStyle = 'rgba(255,255,255,.8)';
-  ctx.font = '11px sans-serif';
-  values.forEach((item, index) => {
-    const y = 16 + index * 14;
-    ctx.fillStyle = colors[index % colors.length];
-    ctx.fillRect(12, y - 8, 8, 8);
-    ctx.fillStyle = 'rgba(255,255,255,.76)';
-    ctx.fillText(`${item.name} ${Math.round((item.value / total) * 100)}%`, 26, y);
-  });
+  charts[canvasId] = new Chart(canvas, config);
 }
 
 function renderSliceCards() {
@@ -346,10 +341,10 @@ function renderPies() {
   const devices = demoCampaign.slices.devices;
   const gender = demoCampaign.slices.gender;
 
-  drawPie('deviceSpendChart', devices.map((item) => ({ name: item.name, value: item.spend })));
-  drawPie('deviceClicksChart', devices.map((item) => ({ name: item.name, value: item.clicks })));
-  drawPie('genderSpendChart', gender.map((item) => ({ name: item.name, value: item.spend })));
-  drawPie('genderClicksChart', gender.map((item) => ({ name: item.name, value: item.clicks })));
+  drawPie('deviceSpendChart', devices.map((item) => ({ name: item.name, value: item.spend })), 'Расходы по устройствам');
+  drawPie('deviceClicksChart', devices.map((item) => ({ name: item.name, value: item.clicks })), 'Клики по устройствам');
+  drawPie('genderSpendChart', gender.map((item) => ({ name: item.name, value: item.spend })), 'Расходы по полу');
+  drawPie('genderClicksChart', gender.map((item) => ({ name: item.name, value: item.clicks })), 'Клики по полу');
 }
 
 function init() {

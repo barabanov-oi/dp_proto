@@ -88,7 +88,7 @@
             <span class="delta warn" id="deltaSpend">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiSpend">—</div>
-          <svg class="kpiSparkline" id="sparkSpend" viewBox="0 0 120 32" aria-hidden="true"></svg>
+          <canvas class="kpiSparkline" id="sparkSpend" width="120" height="32" aria-hidden="true"></canvas>
         </div>
 
         <div class="kpiCard" data-metric="impressions" role="button" tabindex="0">
@@ -99,7 +99,7 @@
             <span class="delta good" id="deltaImpr">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiImpr">—</div>
-          <svg class="kpiSparkline" id="sparkImpressions" viewBox="0 0 120 32" aria-hidden="true"></svg>
+          <canvas class="kpiSparkline" id="sparkImpressions" width="120" height="32" aria-hidden="true"></canvas>
         </div>
 
         <div class="kpiCard" data-metric="ctr" role="button" tabindex="0">
@@ -110,7 +110,7 @@
             <span class="delta good" id="deltaCtr">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiCtr">—</div>
-          <svg class="kpiSparkline" id="sparkCtr" viewBox="0 0 120 32" aria-hidden="true"></svg>
+          <canvas class="kpiSparkline" id="sparkCtr" width="120" height="32" aria-hidden="true"></canvas>
         </div>
 
         <div class="kpiCard" data-metric="clicks" role="button" tabindex="0">
@@ -121,7 +121,7 @@
             <span class="delta good" id="deltaClicks">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiClicks">—</div>
-          <svg class="kpiSparkline" id="sparkClicks" viewBox="0 0 120 32" aria-hidden="true"></svg>
+          <canvas class="kpiSparkline" id="sparkClicks" width="120" height="32" aria-hidden="true"></canvas>
         </div>
 
         <div class="kpiCard" data-metric="cpc" role="button" tabindex="0">
@@ -132,7 +132,7 @@
             <span class="delta warn" id="deltaCpc">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiCpc">—</div>
-          <svg class="kpiSparkline" id="sparkCpc" viewBox="0 0 120 32" aria-hidden="true"></svg>
+          <canvas class="kpiSparkline" id="sparkCpc" width="120" height="32" aria-hidden="true"></canvas>
         </div>
 
         <div class="kpiCard" data-metric="conversions" role="button" tabindex="0">
@@ -143,7 +143,7 @@
             <span class="delta good" id="deltaConv">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiConv">—</div>
-          <svg class="kpiSparkline" id="sparkConversions" viewBox="0 0 120 32" aria-hidden="true"></svg>
+          <canvas class="kpiSparkline" id="sparkConversions" width="120" height="32" aria-hidden="true"></canvas>
         </div>
 
         <div class="kpiCard" data-metric="cr" role="button" tabindex="0">
@@ -154,7 +154,7 @@
             <span class="delta bad" id="deltaCr">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiCr">—</div>
-          <svg class="kpiSparkline" id="sparkCr" viewBox="0 0 120 32" aria-hidden="true"></svg>
+          <canvas class="kpiSparkline" id="sparkCr" width="120" height="32" aria-hidden="true"></canvas>
         </div>
 
         <div class="kpiCard" data-metric="cpa" role="button" tabindex="0">
@@ -165,7 +165,7 @@
             <span class="delta bad" id="deltaCpa">▲ 0.0%</span>
           </div>
           <div class="kpiValue mono" id="kpiCpa">—</div>
-          <svg class="kpiSparkline" id="sparkCpa" viewBox="0 0 120 32" aria-hidden="true"></svg>
+          <canvas class="kpiSparkline" id="sparkCpa" width="120" height="32" aria-hidden="true"></canvas>
         </div>
       </section>
 
@@ -304,6 +304,7 @@
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="./js/monitoring-utils.js"></script>
   <script src="./js/monitoring-data.js"></script>
   <script src="./js/monitoring-kpi.js"></script>
