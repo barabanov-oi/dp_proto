@@ -137,6 +137,9 @@ select, input[type="date"]{
 .kpiCard[role="button"]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
 .channelSection{display:grid;gap:12px;margin-bottom:14px;}
+.balanceIndicator{width:8px;height:8px;border-radius:50%;background:var(--good);display:inline-block;flex:none;}
+.balanceCard{margin-bottom:6px;}
+
 .channelTable{min-width: 100%;}
 
 .grid{display:grid;grid-template-columns: repeat(12, 1fr);gap:14px;}
@@ -157,10 +160,10 @@ canvas{ width:100%; height:260px; display:block; }
 .statusList{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none;}
 .statusItem{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px;border-radius:14px;background:#f8fbff;border:1px solid #e3ebf8;}
 .statusLeft{ display:flex; gap:10px; align-items:flex-start; }
-.badge{width:10px;height:10px;border-radius:999px; margin-top:3px;background:#c3cee0;flex:none;}
-.badge.good{ background: var(--good); }
-.badge.warn{ background: var(--warn); }
-.badge.bad{ background: var(--bad); }
+.statusList .badge{width:10px;height:10px;border-radius:999px; margin-top:3px;background:#c3cee0;flex:none;padding:0;}
+.statusList .badge.good{ background: var(--good); }
+.statusList .badge.warn{ background: var(--warn); }
+.statusList .badge.bad{ background: var(--bad); }
 .statusItem b{ font-size:13px; display:block; margin-bottom:2px; }
 .statusItem small{ color: var(--muted); font-size:12px; display:block; }
 .statusRight{text-align:right;font-size:12px;color:#5e6f89;white-space:nowrap;}
@@ -244,10 +247,10 @@ canvas{ width:100%; height:260px; display:block; }
 [data-theme="dark"] .kpiCard[role="button"]:hover{border-color:rgba(109,94,252,.6);}
 [data-theme="dark"] .cardHeader{border-color:rgba(255,255,255,.06);}
 [data-theme="dark"] .statusItem{background:rgba(0,0,0,.14);border-color:rgba(255,255,255,.06);}
-[data-theme="dark"] .badge{background:rgba(255,255,255,.25);}
-[data-theme="dark"] .badge.good{background:var(--good);}
-[data-theme="dark"] .badge.warn{background:var(--warn);}
-[data-theme="dark"] .badge.bad{background:var(--bad);}
+[data-theme="dark"] .statusList .badge{background:rgba(255,255,255,.25);}
+[data-theme="dark"] .statusList .badge.good{background:var(--good);}
+[data-theme="dark"] .statusList .badge.warn{background:var(--warn);}
+[data-theme="dark"] .statusList .badge.bad{background:var(--bad);}
 [data-theme="dark"] .statusRight{color:rgba(255,255,255,.82);}
 [data-theme="dark"] .tag{border-color:rgba(255,255,255,.10);background:rgba(255,255,255,.03);color:rgba(255,255,255,.85);}
 [data-theme="dark"] .tag.good{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.08);}

@@ -60,24 +60,33 @@
     const cr = totals.clicks ? (totals.conversions / totals.clicks) * 100 : 0;
     const cpa = totals.conversions ? (totals.spend / totals.conversions) : 0;
 
-    document.getElementById("kpiSpend").textContent = ns.formatMoney(totals.spend, 0);
-    document.getElementById("kpiBalance").textContent = ns.formatMoney(ns.demo.totals.balance, 2);
-    document.getElementById("kpiImpr").textContent = ns.formatInt(totals.impressions);
-    document.getElementById("kpiCtr").textContent = ns.formatPct(ctr, 2);
-    document.getElementById("kpiClicks").textContent = ns.formatInt(totals.clicks);
-    document.getElementById("kpiCpc").textContent = ns.formatMoney(cpc, 2);
-    document.getElementById("kpiConv").textContent = ns.formatInt(totals.conversions);
-    document.getElementById("kpiCr").textContent = ns.formatPct(cr, 2);
-    document.getElementById("kpiCpa").textContent = ns.formatMoney(cpa, 2);
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    };
+    const setDeltaSafe = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) ns.setDelta(el, value);
+    };
 
-    ns.setDelta(document.getElementById("deltaSpend"), ns.demo.deltas.spend);
-    ns.setDelta(document.getElementById("deltaImpr"), ns.demo.deltas.impressions);
-    ns.setDelta(document.getElementById("deltaCtr"), ns.demo.deltas.ctr);
-    ns.setDelta(document.getElementById("deltaClicks"), ns.demo.deltas.clicks);
-    ns.setDelta(document.getElementById("deltaCpc"), ns.demo.deltas.cpc);
-    ns.setDelta(document.getElementById("deltaConv"), ns.demo.deltas.conv);
-    ns.setDelta(document.getElementById("deltaCr"), ns.demo.deltas.cr);
-    ns.setDelta(document.getElementById("deltaCpa"), ns.demo.deltas.cpa);
+    setText("kpiSpend", ns.formatMoney(totals.spend, 0));
+    setText("kpiBalance", ns.formatMoney(ns.demo.totals.balance, 2));
+    setText("kpiImpr", ns.formatInt(totals.impressions));
+    setText("kpiCtr", ns.formatPct(ctr, 2));
+    setText("kpiClicks", ns.formatInt(totals.clicks));
+    setText("kpiCpc", ns.formatMoney(cpc, 2));
+    setText("kpiConv", ns.formatInt(totals.conversions));
+    setText("kpiCr", ns.formatPct(cr, 2));
+    setText("kpiCpa", ns.formatMoney(cpa, 2));
+
+    setDeltaSafe("deltaSpend", ns.demo.deltas.spend);
+    setDeltaSafe("deltaImpr", ns.demo.deltas.impressions);
+    setDeltaSafe("deltaCtr", ns.demo.deltas.ctr);
+    setDeltaSafe("deltaClicks", ns.demo.deltas.clicks);
+    setDeltaSafe("deltaCpc", ns.demo.deltas.cpc);
+    setDeltaSafe("deltaConv", ns.demo.deltas.conv);
+    setDeltaSafe("deltaCr", ns.demo.deltas.cr);
+    setDeltaSafe("deltaCpa", ns.demo.deltas.cpa);
 
     document.querySelectorAll(".kpiCard").forEach((card) => {
       const delta = card.querySelector(".delta");
